@@ -49,8 +49,8 @@ def add(ui):
                   'display.width', 100,
                   'expand_frame_repr', False)
     print(cata)
-    opr.add(ques, "null", ans, "null", cata, chap, sec, diff)
-    d = opr.inquire("category="+cata)
+    opr.add_exercise(ques, "null", ans, "null", cata, chap, sec, diff)
+    d = opr.query_exercise("category="+cata)
     print(d)
 
 
@@ -65,13 +65,13 @@ def sreach(ui):
     if ui.keybtn.isChecked():
         by = 0
     if ui.codebtn.isChecked():
-        d = opr.inquire("exercise_base_info.ExerciseCode="+value)
+        d = opr.query_exercise("exercise_base_info.ExerciseCode="+value)
         print(d)
     if ui.catabtn.isChecked():
         cata = "'"+value+"'"
-        d = opr.inquire("category="+cata)
+        d = opr.query_exercise("category="+cata)
         print(d)
-        ui.outputtxt.set
+
 
 
 def main():
