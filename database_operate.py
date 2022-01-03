@@ -2,7 +2,21 @@ import pymysql
 import pandas as pd
 
 
+def get_dataframe(value, description) -> pd.DataFrame:
+    """
+    transform sql query result to DataFrame
+    :param tuple value:
+    :param description:
+    :return:
+    """
+    result = pd.DataFrame(value, columns=[x[0] for x in description])
+    return result.groupby(level=0, axis=1).first()
+
+
 class DatabaseOperate:
+    __exercise_base = {"topic", "topic_picture", "answer", "answer_picture"}
+    __exercise_extra = {"category", "chapter", "section", "difficulty"}
+
     def __init__(self, host, user, password, database):
         """
         connect the database by argus
@@ -79,7 +93,6 @@ class DatabaseOperate:
         :param str condition: query by condition
         :return:
         """
-
         sql = "select * from %s left join %s on %s.ExerciseCode = %s.ExerciseCode " % (
             "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")
         if condition == "all":
@@ -88,8 +101,7 @@ class DatabaseOperate:
             sql += condition + ';'
 
         value, description = self.__execution(sql)
-        result = pd.DataFrame(value, columns=[x[0] for x in description])
-        return result.groupby(level=0, axis=1).first()
+        return get_dataframe(value, description)
 
     def update_exercise(self, exercise_id, columns, values):
         """
@@ -105,13 +117,27 @@ class DatabaseOperate:
         update_base = []
         update_extra = []
         for key, value in pretreatment.items():
-            if key in {"topic", "topic_picture", "answer", "answer_picture"}:
+            if key in self.__exercise_base:
                 update_base += [key + '=' + value]
-            if key in {"category", "chapter", "section", "difficulty"}:
+            if key in self.__exercise_extra:
                 update_extra += [key + '=' + value]
         sql_base = "update exercise_base_info set %s where ExerciseCode=%d;" % (','.join(update_base), exercise_id)
         sql_extra = "update exercise_extra_info set %s where ExerciseCode=%d;" % (','.join(update_extra), exercise_id)
         self.__execution(sql_base, sql_extra)
+
+    def statistic_exercise(self, column) -> pd.DataFrame:
+        """
+        Statistics the num of exercise
+        :param str column: Statistics by this column
+        :return:
+        """
+        sql = None
+        if column in self.__exercise_base:
+            sql = "select %s, COUNT(ExerciseCode) as num from exercise_base_info group by %s;" % (column, column)
+        if column in self.__exercise_extra:
+            sql = "select %s, COUNT(ExerciseCode) as num from exercise_extra_info group by %s;" % (column, column)
+        value, description = self.__execution(sql)
+        return get_dataframe(value, description)
 
     def __del__(self):
         self.__cursor.close()
@@ -125,7 +151,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.update_exercise(2, ['answer', 'difficulty', 'topic'], ["'B'", "'中'", "'测试'"]))
+    print(bop.statistic_exercise("difficulty"))
 
 
 if __name__ == '__main__':
