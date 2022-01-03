@@ -52,14 +52,14 @@ class DatabaseOperate:
         :param str category: category of the exercise with '' include '选择','填空','判断','名词解释','问答','算法','计算'
         :param int chapter: chapter of the exercise
         :param int section: section of the exercise
-        :param str difficulty: difficulty of the exercise with '' include '高','中','低'
+        :param str difficulty: difficulty of with the exercise with '' include '高','中','低'
         :return: None
         """
-        sql_1 = "insert into exercise_base_info (topic,topic_picture,answer,answer_picture) values (%s,%s,%s,%s);" % (
+        sql_base = "insert into exercise_base_info (topic,topic_picture,answer,answer_picture) values (%s,%s,%s,%s);" % (
             topic, topic_picture, answer, answer_picture)
-        sql_2 = "insert into exercise_extra_info (category,chapter,section,difficulty) values (%s,%d,%d,%s);" % (
+        sql_extra = "insert into exercise_extra_info (category,chapter,section,difficulty) values (%s,%d,%d,%s);" % (
             category, chapter, section, difficulty)
-        self.__execution(sql_1, sql_2)
+        self.__execution(sql_base, sql_extra)
 
     def delete_exercise(self, exercise_id):
         """
@@ -68,21 +68,50 @@ class DatabaseOperate:
         :param int exercise_id: the only representation of the exercise
         :return:
         """
-        sql = "delete from exercise_base_info where ExerciseCode = %d" % exercise_id
+        sql = "delete from exercise_base_info where ExerciseCode = %d;" % exercise_id
         self.__execution(sql)
 
     def query_exercise(self, condition) -> pd.DataFrame:
         """
-        inquire exercise from database by condition
+        query exercise from database by condition.
+        condition="all" means query all exercise
 
         :param str condition: query by condition
         :return:
         """
-        sql = "select * from %s left join %s on %s.ExerciseCode = %s.ExerciseCode where " % (
-            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info") + condition
+
+        sql = "select * from %s left join %s on %s.ExerciseCode = %s.ExerciseCode " % (
+            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")
+        if condition == "all":
+            sql += ';'
+        else:
+            sql += condition + ';'
+
         value, description = self.__execution(sql)
         result = pd.DataFrame(value, columns=[x[0] for x in description])
         return result.groupby(level=0, axis=1).first()
+
+    def update_exercise(self, exercise_id, columns, values):
+        """
+        update exercise by argus
+
+
+        :param int exercise_id: the only representation of the exercise
+        :param columns: the all index of the update values
+        :param values: all update value
+        :return:
+        """
+        pretreatment = dict(zip(columns, values))
+        update_base = []
+        update_extra = []
+        for key, value in pretreatment.items():
+            if key in {"topic", "topic_picture", "answer", "answer_picture"}:
+                update_base += [key + '=' + value]
+            if key in {"category", "chapter", "section", "difficulty"}:
+                update_extra += [key + '=' + value]
+        sql_base = "update exercise_base_info set %s where ExerciseCode=%d;" % (','.join(update_base), exercise_id)
+        sql_extra = "update exercise_extra_info set %s where ExerciseCode=%d;" % (','.join(update_extra), exercise_id)
+        self.__execution(sql_base, sql_extra)
 
     def __del__(self):
         self.__cursor.close()
@@ -91,13 +120,12 @@ class DatabaseOperate:
 
 def main():
     bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
-    bop.add_exercise("'测试用例'", "null", "'测试答案'", "null", "'填空'", 1, 1, "'高'")
-    # pd.set_option('display.max_columns', None,
-    #             'display.max_rows', None,
-    #            'display.max_colwidth', None,
-    #           'display.width', 100,
-    #          'expand_frame_repr', False)
-    # print(bop.query("*"))
+    pd.set_option('display.max_columns', None,
+                  'display.max_rows', None,
+                  'display.max_colwidth', None,
+                  'display.width', 100,
+                  'expand_frame_repr', False)
+    print(bop.update_exercise(2, ['answer', 'difficulty', 'topic'], ["'B'", "'中'", "'测试'"]))
 
 
 if __name__ == '__main__':
