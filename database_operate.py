@@ -98,7 +98,7 @@ class DatabaseOperate:
         if condition == "all":
             sql += ';'
         else:
-            sql += condition + ';'
+            sql += "where %s" % condition + ';'
 
         value, description = self.__execution(sql)
         return get_dataframe(value, description)
@@ -151,7 +151,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.statistic_exercise("difficulty"))
+    print(bop.query_exercise("category='填空'"))
 
 
 if __name__ == '__main__':
