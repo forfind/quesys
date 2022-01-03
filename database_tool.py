@@ -65,6 +65,11 @@ class DatabaseTool:
 
     def delete(self, tables, conditions):
         """
+        Delete eligible items from tables
+
+        :param str tables: list of table
+        :param str conditions: list of condition to delete
+        :return:
         """
         sql = []
         for t, c in zip(tables, conditions):
@@ -72,6 +77,14 @@ class DatabaseTool:
         self.__execution(sql)
 
     def update(self, tables, contents, conditions):
+        """
+        Update tables
+
+        :param str tables: table to update
+        :param str contents: the contents to update
+        :param str conditions: update item with this conditions
+        :return:
+        """
         sql = []
         for table, content, condition in zip(tables, contents, conditions):
             sql.append("update %s set %s where %s;" % (table, content, condition))
@@ -79,6 +92,12 @@ class DatabaseTool:
 
     def query(self, tables, columns, conditions) -> pd.DataFrame:
         """
+        Query items from tables
+
+        :param str tables: query from these tables
+        :param str columns: echo these columns
+        :param str conditions: query condition
+        :return:
         """
         sql = []
         for t, col, con in zip(tables, columns, conditions):
