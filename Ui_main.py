@@ -1,5 +1,11 @@
 import sys
+
+import PyQt5
+
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout
+from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
+from PyQt5.QtGui import QPainter, QPen
+from PyQt5.QtCore import Qt
 
 
 from ui_Qedit import *
@@ -7,13 +13,14 @@ from ui_pdct import *
 from ui_sch import *
 from ui_change import *
 
+
 class mainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self,data):
         super().__init__()
-        self.init_ui()
+        self.init_ui(data)
 
 
-    def init_ui(self):
+    def init_ui(self,data):
 
         self.resize(1000, 800)
 
@@ -23,13 +30,14 @@ class mainWindow(QMainWindow):
         self.main_widget.setLayout(self.main_layout)  # 将主部件设置为网格布局
 
         self.init_left()
-        self.init_right()
+        self.init_right(data)
         # 将初始化完成的左侧、右侧空间加入整体空间的网格布局
         self.main_layout.addWidget(self.lwidget, 0, 0, 1, 1)
         self.main_layout.addWidget(self.schwidget, 0, 1, 1, 6)
         self.main_layout.addWidget(self.chgwidget, 0, 1, 1, 6)
         self.main_layout.addWidget(self.addwidget, 0, 1, 1, 6)
         self.main_layout.addWidget(self.mngwidget, 0, 1, 1, 6)
+        self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         # 将右侧窗口隐藏，避免重叠
         self.addwidget.hide()
         self.schwidget.hide()
@@ -77,10 +85,11 @@ class mainWindow(QMainWindow):
         self.schbtm.clicked.connect(self.showsch)
         self.chgbtm.clicked.connect(self.showchg)
         self.mngbtm.clicked.connect(self.showmng)
+        self.disbtm.clicked.connect(self.showall)
 
 
 
-    def init_right(self):
+    def init_right(self,data):
         self.addwidget = QWidget()
         self.addwidget.setObjectName('addwidget')
         self.addui = Ui_QeditForm()
@@ -101,30 +110,86 @@ class mainWindow(QMainWindow):
         #self.mngui = Ui_mngForm()
         #self.mngui.setupUi(self.mngwidget)
 
+        self.allwidget = self.create_piechart(data)
+        self.allwidget.setObjectName('allwidget')
+
+    def create_piechart(self,ls):
+        # 创建QPieSeries对象，它用来存放饼图的数据
+        series = PyQt5.QtChart.QPieSeries()
+        # append方法中的数字，代表的是权重，完成可以改成其它，如80,70,60等等
+        series.append("低", ls[0])
+        series.append("中", ls[1])
+        series.append("高", ls[2])
+
+        # 单独处理某个扇区
+        slice = PyQt5.QtChart.QPieSlice()
+
+        # 这里要处理的是python项，是依据前面append的顺序，如果是处理C++项的话，那索引就是3
+        slice = series.slices()[0]
+
+        # 突出显示，设置颜色
+        slice.setExploded(True)
+        slice.setLabelVisible(True)
+        slice.setPen(QPen(Qt.red, 2))
+        slice.setBrush(Qt.red)
+
+        # 创建QChart实例，它是PyQt5中的类
+        chart = PyQt5.QtChart.QChart()
+        # QLegend类是显示图表的图例，先隐藏掉
+        chart.legend().hide()
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+
+        # 设置动画效果
+        chart.setAnimationOptions(PyQt5.QtChart.QChart.SeriesAnimations)
+
+        # 设置标题
+        chart.setTitle("题库试题难度分布")
+
+        chart.legend().setVisible(True)
+
+        # 对齐方式
+        chart.legend().setAlignment(Qt.AlignBottom)
+
+        # 创建ChartView，它是显示图表的控件
+        chartview = PyQt5.QtChart.QChartView(chart)
+        chartview.setRenderHint(QPainter.Antialiasing)
+        return chartview
+
     def showadd(self):
         self.addwidget.show()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
+        self.allwidget.hide()
 
     def showsch(self):
         self.addwidget.hide()
         self.schwidget.show()
         self.chgwidget.hide()
         self.mngwidget.hide()
+        self.allwidget.hide()
 
     def showchg(self):
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.show()
         self.mngwidget.hide()
+        self.allwidget.hide()
 
     def showmng(self):
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.show()
+        self.allwidget.hide()
 
+    def showall(self):
+        self.addwidget.hide()
+        self.schwidget.hide()
+        self.chgwidget.hide()
+        self.mngwidget.hide()
+        self.allwidget.show()
 
 
 

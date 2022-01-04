@@ -132,7 +132,9 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.statistic_exercise("category"))
+    #print(bop.statistic_exercise("category"))
+    print(bop.query_exercise("category='填空'"))
+    bop.delete_exercise(2)
 
 
 if __name__ == '__main__':
