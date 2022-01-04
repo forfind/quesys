@@ -5,6 +5,7 @@ import pandas as pd
 def get_dataframe(value, description) -> pd.DataFrame:
     """
     transform sql query result to DataFrame
+
     :param tuple value:
     :param description:
     :return:
@@ -57,6 +58,12 @@ class DatabaseTool:
 
     def add(self, tables, columns, values):
         """
+        add to tables
+
+        :param list tables: tables to add
+        :param list columns: columns in add
+        :param list values: values to add
+        :return:
         """
         sql = []
         for t, c, v in zip(tables, columns, values):
@@ -67,8 +74,8 @@ class DatabaseTool:
         """
         Delete eligible items from tables
 
-        :param str tables: list of table
-        :param str conditions: list of condition to delete
+        :param list tables: list of table
+        :param list conditions: list of condition to delete
         :return:
         """
         sql = []
@@ -80,9 +87,9 @@ class DatabaseTool:
         """
         Update tables
 
-        :param str tables: table to update
-        :param str contents: the contents to update
-        :param str conditions: update item with this conditions
+        :param list tables: table to update
+        :param list contents: the contents to update
+        :param list conditions: update item with this conditions
         :return:
         """
         sql = []
@@ -94,9 +101,9 @@ class DatabaseTool:
         """
         Query items from tables
 
-        :param str tables: query from these tables
-        :param str columns: echo these columns
-        :param str conditions: query condition
+        :param list tables: query from these tables
+        :param list columns: echo these columns
+        :param list conditions: query condition
         :return:
         """
         sql = []

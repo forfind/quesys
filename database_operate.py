@@ -49,6 +49,21 @@ class DatabaseOperate:
                   ','.join([category, str(chapter), str(section), difficulty])]
         self.__dbt.add(tables, columns, values)
 
+    def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
+        """
+        add paper
+
+        :param str chapter: range of paper
+        :param double difficulty_high: percentage of high exercise
+        :param double difficulty_middle: percentage of middle exercise
+        :param double difficulty_low: percentage of low exercise
+        :return:
+        """
+        tables = ["paper"]
+        columns = ["chapter", "difficulty_high", "difficulty_middle", "difficulty_low"]
+        values = [chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low)]
+        self.__dbt.add(tables, columns, values)
+
     def delete_exercise(self, exercise_id):
         """
         delete the exercise from database by exercise id
@@ -58,6 +73,17 @@ class DatabaseOperate:
         """
         tables = ["exercise_base_info"]
         conditions = ["ExerciseCode = %d" % exercise_id]
+        self.__dbt.delete(tables, conditions)
+
+    def delete_paper(self, test_id):
+        """
+        delete the paper from database by test id
+
+        :param int test_id: the only representation of the paper
+        :return:
+        """
+        tables = ["paper"]
+        conditions = ["TestCode = %d" % test_id]
         self.__dbt.delete(tables, conditions)
 
     def update_exercise(self, exercise_id, columns, values):
@@ -103,8 +129,25 @@ class DatabaseOperate:
         else:
             condition = "where %s" % condition
 
-        tables = ["%s left join %s on %s.ExerciseCode=%s.ExerciseCode" % (
-            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")]
+        tables = ["exercise_extra_info"]
+        columns = ["*"]
+        conditions = [condition]
+        return self.__dbt.query(tables, columns, conditions)
+
+    def query_paper(self, condition) -> pd.DataFrame:
+        """
+        query paper from database by condition.
+        condition="all" means query all paper
+
+        :param str condition: query by condition
+        :return:
+        """
+        if condition == "all":
+            condition = ''
+        else:
+            condition = "where %s" % condition
+
+        tables = ["paper"]
         columns = ["*"]
         conditions = [condition]
         return self.__dbt.query(tables, columns, conditions)
