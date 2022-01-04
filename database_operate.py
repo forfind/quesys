@@ -29,7 +29,7 @@ class DatabaseOperate:
         """
         self.__dbt = DatabaseTool(host, user, password, database)
 
-    def add_exercise(self, topic, topic_picture, answer, answer_picture, category, chapter, section, difficulty):
+    def add_exercise(self, topic, topic_picture, answer, answer_picture, category, chapter, part, difficulty):
         """
         add exercise to database
 
@@ -39,14 +39,14 @@ class DatabaseOperate:
         :param str answer_picture: picture to supplement answer
         :param str category: category of the exercise with '' include '选择','填空','判断','名词解释','问答','算法','计算'
         :param int chapter: chapter of the exercise
-        :param int section: section of the exercise
+        :param int part: part of the exercise
         :param str difficulty: difficulty of with the exercise with '' include '高','中','低'
         :return: None
         """
         tables = ["exercise_base_info", "exercise_extra_info"]
-        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,section,difficulty"]
+        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,part,difficulty"]
         values = [','.join([topic, topic_picture, answer, answer_picture]),
-                  ','.join([category, str(chapter), str(section), difficulty])]
+                  ','.join([category, str(chapter), str(part), difficulty])]
         self.__dbt.add(tables, columns, values)
 
     def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
@@ -129,6 +129,27 @@ class DatabaseOperate:
         else:
             condition = "where %s" % condition
 
+        base = "exercise_base_info"
+        extra = "exercise_extra_info"
+
+        tables = ["%s join %s on %s.ExerciseCode=%s.ExerciseCode" % (base, extra, base, extra)]
+        columns = ["*"]
+        conditions = [condition]
+        return self.__dbt.query(tables, columns, conditions)
+
+    def query_extra_exercise(self, condition) -> pd.DataFrame:
+        """
+        query exercise from database by condition.
+        condition="all" means query all exercise
+
+        :param str condition: query by condition
+        :return:
+        """
+        if condition == "all":
+            condition = ''
+        else:
+            condition = "where %s" % condition
+
         tables = ["exercise_extra_info"]
         columns = ["*"]
         conditions = [condition]
@@ -175,7 +196,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.statistic_exercise("category"))
+    print(bop.add_exercise("'ques'", "null", "'ans'", "null", "'填空'", 1, 1, "'低'"))
 
 
 if __name__ == '__main__':
