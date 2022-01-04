@@ -48,6 +48,7 @@ class DatabaseOperate:
         values = [','.join([topic, topic_picture, answer, answer_picture]),
                   ','.join([category, str(chapter), str(part), difficulty])]
         self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
 
     def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
         """
@@ -60,9 +61,10 @@ class DatabaseOperate:
         :return:
         """
         tables = ["paper"]
-        columns = ["chapter", "difficulty_high", "difficulty_middle", "difficulty_low"]
-        values = [chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low)]
+        columns = ["chapter, difficulty_high, difficulty_middle, difficulty_low"]
+        values = ["%s,%s,%s,%s" % (chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low))]
         self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
 
     def delete_exercise(self, exercise_id):
         """
@@ -196,7 +198,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.add_exercise("'ques'", "null", "'ans'", "null", "'填空'", 1, 1, "'低'"))
+    print(bop.add_paper("'1,2,3,4'", .40, .40, .20))
 
 
 if __name__ == '__main__':

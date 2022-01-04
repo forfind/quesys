@@ -47,6 +47,7 @@ class DatabaseTool:
         """
         try:
             for sql in sql_sentence:
+                print(sql)
                 self.__cursor.execute(sql)
         except pymysql.err.Error as e:
             self.__conn.rollback()
@@ -112,6 +113,11 @@ class DatabaseTool:
 
         value, description = self.__execution(sql)
         return get_dataframe(value, description)
+
+    def get_last_id(self):
+        sql = ["select @@IDENTITY;"]
+        value, description = self.__execution(sql)
+        return value[0][0]
 
     def __del__(self):
         self.__cursor.close()
