@@ -8,7 +8,6 @@ from database_operate import *
 from PyQt5.QtWidgets import *
 
 
-
 def test(ui):
     cata = ''
     print("succ")
@@ -61,7 +60,6 @@ def add(ui):
     d = opr.query_exercise("category="+cata)
     print(d)
 
-
 def sreach(ui):
     opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
     pd.set_option('display.max_columns', None,
@@ -89,9 +87,10 @@ def sreach(ui):
         #print(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
 
 def remove_item(list):
-    if list.count()>0:
+    if list.count() > 0:
         for i in range(list.count()):
             item = list.item(i)
+
             if item.isSelected():
                 code = int(str(list.item(i).text()).split()[0])
 
@@ -100,15 +99,18 @@ def remove_item(list):
                 list.removeItemWidget(list.takeItem(i))
                 # 此处+对话框
                 opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+                pd.set_option('display.max_columns', None,
+                    'display.max_rows', None,
+                    'display.max_colwidth', None,
+                    'display.width', 100,
+                    'expand_frame_repr', False)
                 opr.delete_exercise(code)
+                break
+
 
 def statistic_info():
     bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
-    pd.set_option('display.max_columns', None,
-                  'display.max_rows', None,
-                  'display.max_colwidth', None,
-                  'display.width', 100,
-                  'expand_frame_repr', False)
+
     data = bop.statistic_exercise("difficulty")
     print(data)
     datalist = []
@@ -117,17 +119,21 @@ def statistic_info():
     print(datalist)
     return datalist
 
-def main():
-
-    app = QApplication(sys.argv)
-
+def updata_info(win):
     datalist = statistic_info()
+    win.showall(datalist)
+
+def main():
+    app = QApplication(sys.argv)
+    datalist = statistic_info()
+    print(datalist)
     mainwin = mainWindow(datalist)
     mainwin.show()
+
     mainwin.addui.submit.clicked.connect(partial(add, mainwin.addui))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
-    mainwin.disbtm.clicked.connect(partial(mainwin.showall,statistic_info()))
+    mainwin.disbtm.clicked.connect(partial(updata_info,mainwin))
 
     sys.exit(app.exec_())
 
