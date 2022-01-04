@@ -29,7 +29,7 @@ class DatabaseOperate:
         """
         self.__dbt = DatabaseTool(host, user, password, database)
 
-    def add_exercise(self, topic, topic_picture, answer, answer_picture, category, chapter, section, difficulty):
+    def add_exercise(self, topic, topic_picture, answer, answer_picture, category, chapter, part, difficulty):
         """
         add exercise to database
 
@@ -39,14 +39,51 @@ class DatabaseOperate:
         :param str answer_picture: picture to supplement answer
         :param str category: category of the exercise with '' include '选择','填空','判断','名词解释','问答','算法','计算'
         :param int chapter: chapter of the exercise
-        :param int section: section of the exercise
+        :param int part: part of the exercise
         :param str difficulty: difficulty of with the exercise with '' include '高','中','低'
         :return: None
         """
         tables = ["exercise_base_info", "exercise_extra_info"]
-        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,section,difficulty"]
+        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,part,difficulty"]
         values = [','.join([topic, topic_picture, answer, answer_picture]),
-                  ','.join([category, str(chapter), str(section), difficulty])]
+                  ','.join([category, str(chapter), str(part), difficulty])]
+        self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
+
+    def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
+        """
+        add paper
+
+        :param str chapter: range of paper
+        :param double difficulty_high: percentage of high exercise
+        :param double difficulty_middle: percentage of middle exercise
+        :param double difficulty_low: percentage of low exercise
+        :return:
+        """
+        tables = ["paper"]
+        columns = ["chapter, difficulty_high, difficulty_middle, difficulty_low"]
+        values = ["%s,%s,%s,%s" % (chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low))]
+        self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
+
+    def test_exercise(self, test_id, exercise_id):
+        """
+        select exercise to test
+
+        :param int test_id: the only representation of the paper
+        :param int exercise_id: the only representation of the exercise
+        :return:
+        """
+        tables = ["paper_exercise"]
+        columns = ["MAX(number)"]
+        conditions = ["where TestCode=%s" % test_id]
+        num = self.__dbt.query(tables, columns, conditions).iat[0, 0]
+        if num is None:
+            num = 1
+        else:
+            num += 1
+        columns = ["TestCode, ExerciseCode, number"]
+        values = ["%d,%d,%d" % (test_id, exercise_id, num)]
         self.__dbt.add(tables, columns, values)
 
     def delete_exercise(self, exercise_id):
@@ -58,6 +95,17 @@ class DatabaseOperate:
         """
         tables = ["exercise_base_info"]
         conditions = ["ExerciseCode = %d" % exercise_id]
+        self.__dbt.delete(tables, conditions)
+
+    def delete_paper(self, test_id):
+        """
+        delete the paper from database by test id
+
+        :param int test_id: the only representation of the paper
+        :return:
+        """
+        tables = ["paper"]
+        conditions = ["TestCode = %d" % test_id]
         self.__dbt.delete(tables, conditions)
 
     def update_exercise(self, exercise_id, columns, values):
@@ -103,11 +151,55 @@ class DatabaseOperate:
         else:
             condition = "where %s" % condition
 
-        tables = ["%s left join %s on %s.ExerciseCode=%s.ExerciseCode" % (
-            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")]
+        base = "exercise_base_info"
+        extra = "exercise_extra_info"
+
+        tables = ["%s join %s on %s.ExerciseCode=%s.ExerciseCode" % (base, extra, base, extra)]
         columns = ["*"]
         conditions = [condition]
         return self.__dbt.query(tables, columns, conditions)
+
+    def query_extra_exercise(self, condition) -> pd.DataFrame:
+        """
+        query exercise from database by condition.
+        condition="all" means query all exercise
+
+        :param str condition: query by condition
+        :return:
+        """
+        if condition == "all":
+            condition = ''
+        else:
+            condition = "where %s" % condition
+
+        tables = ["exercise_extra_info"]
+        columns = ["*"]
+        conditions = [condition]
+        return self.__dbt.query(tables, columns, conditions)
+
+    def query_paper(self, condition) -> pd.DataFrame:
+        """
+        query paper from database by condition.
+        condition="all" means query all paper
+
+        :param str condition: query by condition
+        :return:
+        """
+        if condition == "all":
+            condition = ''
+        else:
+            condition = "where %s" % condition
+
+        tables = ["paper"]
+        columns = ["*"]
+        conditions = [condition]
+        return self.__dbt.query(tables, columns, conditions)
+
+    def query_exercise_from_paper(self, test_id):
+        tables = ["paper_exercise"]
+        columns = ["*"]
+        conditions = ["where TestCode=%d" % test_id]
+        return self.__dbt.query(tables,columns,conditions)
 
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
@@ -132,9 +224,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    #print(bop.statistic_exercise("category"))
-    print(bop.query_exercise("category='填空'"))
-    bop.delete_exercise(2)
+    print(bop.query_exercise_from_paper(1))
 
 
 if __name__ == '__main__':
