@@ -66,6 +66,26 @@ class DatabaseOperate:
         self.__dbt.add(tables, columns, values)
         return self.__dbt.get_last_id()
 
+    def test_exercise(self, test_id, exercise_id):
+        """
+        select exercise to test
+
+        :param int test_id: the only representation of the paper
+        :param int exercise_id: the only representation of the exercise
+        :return:
+        """
+        tables = ["paper_exercise"]
+        columns = ["MAX(number)"]
+        conditions = ["where TestCode=%s" % test_id]
+        num = self.__dbt.query(tables, columns, conditions).iat[0, 0]
+        if num is None:
+            num = 1
+        else:
+            num += 1
+        columns = ["ExerciseCode, TestCode, number"]
+        values = ["%d,%d,%d" % (test_id, exercise_id, num)]
+        self.__dbt.add(tables, columns, values)
+
     def delete_exercise(self, exercise_id):
         """
         delete the exercise from database by exercise id
@@ -198,7 +218,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.add_paper("'1,2,3,4'", .40, .40, .20))
+    print(bop.test_exercise(1, 1))
 
 
 if __name__ == '__main__':
