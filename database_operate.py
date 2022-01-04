@@ -196,7 +196,9 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
+
     print(bop.add_exercise("'ques'", "null", "'ans'", "null", "'填空'", 1, 1, "'低'"))
+
 
 
 if __name__ == '__main__':
