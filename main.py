@@ -1,7 +1,13 @@
+import PyQt5
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPen, QPainter
+
 from Ui_main import *
 from functools import partial
 from database_operate import *
 from PyQt5.QtWidgets import *
+
+
 
 def test(ui):
     cata = ''
@@ -97,16 +103,26 @@ def remove_item(list):
                 opr.delete_exercise(code)
 
 
-def enter_edit(item):
-    print("enter edit done")
 
 def main():
+    bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+    pd.set_option('display.max_columns', None,
+                  'display.max_rows', None,
+                  'display.max_colwidth', None,
+                  'display.width', 100,
+                  'expand_frame_repr', False)
+    data = bop.statistic_exercise("difficulty")
+    print(data)
+    datalist = [int(data.iat[0,1]),int(data.iat[1,1]),int(data.iat[2,1])]
+    print(datalist)
+
     app = QApplication(sys.argv)
-    mainwin = mainWindow()
+    mainwin = mainWindow(datalist)
     mainwin.show()
     mainwin.addui.submit.clicked.connect(partial(add, mainwin.addui))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
+
     sys.exit(app.exec_())
 
 
