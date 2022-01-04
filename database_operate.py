@@ -82,7 +82,7 @@ class DatabaseOperate:
             num = 1
         else:
             num += 1
-        columns = ["ExerciseCode, TestCode, number"]
+        columns = ["TestCode, ExerciseCode, number"]
         values = ["%d,%d,%d" % (test_id, exercise_id, num)]
         self.__dbt.add(tables, columns, values)
 
@@ -195,6 +195,12 @@ class DatabaseOperate:
         conditions = [condition]
         return self.__dbt.query(tables, columns, conditions)
 
+    def query_exercise_from_paper(self, test_id):
+        tables = ["paper_exercise"]
+        columns = ["*"]
+        conditions = ["where TestCode=%d" % test_id]
+        return self.__dbt.query(tables,columns,conditions)
+
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
         Statistics the num of exercise
@@ -218,7 +224,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.test_exercise(1, 1))
+    print(bop.query_exercise_from_paper(1))
 
 
 if __name__ == '__main__':
