@@ -90,7 +90,7 @@ def sreach(ui):
 
 def remove_item(list):
     if list.count()>0:
-        for i in range(list.count()-1,-1,-1):
+        for i in range(list.count()):
             item = list.item(i)
             if item.isSelected():
                 code = int(str(list.item(i).text()).split()[0])
@@ -102,9 +102,7 @@ def remove_item(list):
                 opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
                 opr.delete_exercise(code)
 
-
-
-def main():
+def statistic_info():
     bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
     pd.set_option('display.max_columns', None,
                   'display.max_rows', None,
@@ -113,15 +111,23 @@ def main():
                   'expand_frame_repr', False)
     data = bop.statistic_exercise("difficulty")
     print(data)
-    datalist = [int(data.iat[0,1]),int(data.iat[1,1]),int(data.iat[2,1])]
+    datalist = []
+    for i in range(len(data)):
+        datalist.append([str(data.iat[i,0]),int(data.iat[i,1])])
     print(datalist)
+    return datalist
+
+def main():
 
     app = QApplication(sys.argv)
+
+    datalist = statistic_info()
     mainwin = mainWindow(datalist)
     mainwin.show()
     mainwin.addui.submit.clicked.connect(partial(add, mainwin.addui))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
+    mainwin.disbtm.clicked.connect(partial(mainwin.showall,statistic_info()))
 
     sys.exit(app.exec_())
 
