@@ -1,4 +1,5 @@
 import pymysql
+from database_tool import DatabaseTool
 import pandas as pd
 
 
@@ -26,34 +27,7 @@ class DatabaseOperate:
         :param str password: user password
         :param str database: database name
         """
-        self.__host = host
-        self.__user = user
-        self.__password = password
-        self.__database = database
-        try:
-            self.__conn = pymysql.connect(host=self.__host, user=self.__user, password=self.__password,
-                                          database=self.__database)
-            self.__cursor = self.__conn.cursor()
-        except pymysql.err.OperationalError as e:
-            print("DataBase connect error")
-
-    def __execution(self, *sql_sentence):
-        """
-        execution the sql sentences
-
-        :param str sql_sentence: sql sentences to execution
-        :return: result of the execution
-        """
-        try:
-            for sql in sql_sentence:
-                self.__cursor.execute(sql)
-        except pymysql.err.Error as e:
-            self.__conn.rollback()
-            print("Sql execution error")
-        else:
-            self.__conn.commit()
-        result = self.__cursor.fetchall()
-        return result, self.__cursor.description
+        self.__dbt = DatabaseTool(host, user, password, database)
 
     def add_exercise(self, topic, topic_picture, answer, answer_picture, category, chapter, section, difficulty):
         """
@@ -69,11 +43,11 @@ class DatabaseOperate:
         :param str difficulty: difficulty of with the exercise with '' include '高','中','低'
         :return: None
         """
-        sql_base = "insert into exercise_base_info (topic,topic_picture,answer,answer_picture) values (%s,%s,%s,%s);" % (
-            topic, topic_picture, answer, answer_picture)
-        sql_extra = "insert into exercise_extra_info (category,chapter,section,difficulty) values (%s,%d,%d,%s);" % (
-            category, chapter, section, difficulty)
-        self.__execution(sql_base, sql_extra)
+        tables = ["exercise_base_info", "exercise_extra_info"]
+        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,section,difficulty"]
+        values = [','.join([topic, topic_picture, answer, answer_picture]),
+                  ','.join([category, str(chapter), str(section), difficulty])]
+        self.__dbt.add(tables, columns, values)
 
     def delete_exercise(self, exercise_id):
         """
@@ -82,26 +56,9 @@ class DatabaseOperate:
         :param int exercise_id: the only representation of the exercise
         :return:
         """
-        sql = "delete from exercise_base_info where ExerciseCode = %d;" % exercise_id
-        self.__execution(sql)
-
-    def query_exercise(self, condition) -> pd.DataFrame:
-        """
-        query exercise from database by condition.
-        condition="all" means query all exercise
-
-        :param str condition: query by condition
-        :return:
-        """
-        sql = "select * from %s left join %s on %s.ExerciseCode = %s.ExerciseCode " % (
-            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")
-        if condition == "all":
-            sql += ';'
-        else:
-            sql += "where %s" % condition + ';'
-
-        value, description = self.__execution(sql)
-        return get_dataframe(value, description)
+        tables = ["exercise_base_info"]
+        conditions = ["ExerciseCode = %d" % exercise_id]
+        self.__dbt.delete(tables, conditions)
 
     def update_exercise(self, exercise_id, columns, values):
         """
@@ -116,14 +73,41 @@ class DatabaseOperate:
         pretreatment = dict(zip(columns, values))
         update_base = []
         update_extra = []
+        tables = []
+        conditions = []
         for key, value in pretreatment.items():
             if key in self.__exercise_base:
                 update_base += [key + '=' + value]
+                if "exercise_base_info" not in tables:
+                    tables.append("exercise_base_info")
+                conditions.append("ExerciseCode=%d" % exercise_id)
             if key in self.__exercise_extra:
                 update_extra += [key + '=' + value]
-        sql_base = "update exercise_base_info set %s where ExerciseCode=%d;" % (','.join(update_base), exercise_id)
-        sql_extra = "update exercise_extra_info set %s where ExerciseCode=%d;" % (','.join(update_extra), exercise_id)
-        self.__execution(sql_base, sql_extra)
+                if "exercise_extra_info" not in tables:
+                    tables.append("exercise_extra_info")
+                conditions.append("ExerciseCode=%d" % exercise_id)
+
+        content = [','.join(update_base), ','.join(update_extra)]
+        self.__dbt.update(tables, content, conditions)
+
+    def query_exercise(self, condition) -> pd.DataFrame:
+        """
+        query exercise from database by condition.
+        condition="all" means query all exercise
+
+        :param str condition: query by condition
+        :return:
+        """
+        if condition == "all":
+            condition = ''
+        else:
+            condition = "where %s" % condition
+
+        tables = ["%s left join %s on %s.ExerciseCode=%s.ExerciseCode" % (
+            "exercise_base_info", "exercise_extra_info", "exercise_base_info", "exercise_extra_info")]
+        columns = ["*"]
+        conditions = [condition]
+        return self.__dbt.query(tables, columns, conditions)
 
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
@@ -131,17 +115,14 @@ class DatabaseOperate:
         :param str column: Statistics by this column
         :return:
         """
-        sql = None
+        tables = []
         if column in self.__exercise_base:
-            sql = "select %s, COUNT(ExerciseCode) as num from exercise_base_info group by %s;" % (column, column)
+            tables = ["exercise_base_info"]
         if column in self.__exercise_extra:
-            sql = "select %s, COUNT(ExerciseCode) as num from exercise_extra_info group by %s;" % (column, column)
-        value, description = self.__execution(sql)
-        return get_dataframe(value, description)
-
-    def __del__(self):
-        self.__cursor.close()
-        self.__conn.close()
+            tables = ["exercise_extra_info"]
+        columns = ["%s, COUNT(ExerciseCode) as num" % column]
+        conditions = ["group by %s" % column]
+        return self.__dbt.query(tables, columns, conditions)
 
 
 def main():
@@ -151,7 +132,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.query_exercise("category='填空'"))
+    print(bop.statistic_exercise("category"))
 
 
 if __name__ == '__main__':
