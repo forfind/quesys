@@ -47,7 +47,6 @@ class DatabaseTool:
         """
         try:
             for sql in sql_sentence:
-                print(sql)
                 self.__cursor.execute(sql)
         except pymysql.err.Error as e:
             self.__conn.rollback()
