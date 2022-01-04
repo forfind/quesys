@@ -46,8 +46,13 @@ class Ui_schForm(object):
         self.schbtn.setObjectName("schbtn")
         self.verticalLayout.addWidget(self.schbtn)
         self.outputlist = QtWidgets.QListWidget(schForm)
+        self.outputlist.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.outputlist.setObjectName("outputlist")
         self.verticalLayout.addWidget(self.outputlist)
+        self.delbtn = QtWidgets.QPushButton(schForm)
+        self.delbtn.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.delbtn.setObjectName("delbtn")
+        self.verticalLayout.addWidget(self.delbtn)
 
         self.retranslateUi(schForm)
         QtCore.QMetaObject.connectSlotsByName(schForm)
@@ -59,3 +64,4 @@ class Ui_schForm(object):
         self.codebtn.setText(_translate("schForm", "按题号"))
         self.catabtn.setText(_translate("schForm", "按类型"))
         self.schbtn.setText(_translate("schForm", "查询"))
+        self.delbtn.setText(_translate("schForm", "删除"))

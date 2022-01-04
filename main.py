@@ -1,6 +1,14 @@
+import PyQt5
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPen, QPainter
+
 from Ui_main import *
 from functools import partial
 from database_operate import *
+from PyQt5.QtWidgets import *
+
+
+
 def test(ui):
     cata = ''
     print("succ")
@@ -49,8 +57,8 @@ def add(ui):
                   'display.width', 100,
                   'expand_frame_repr', False)
     print(cata)
-    opr.add(ques, "null", ans, "null", cata, chap, sec, diff)
-    d = opr.inquire("category="+cata)
+    opr.add_exercise(ques, "null", ans, "null", cata, chap, sec, diff)
+    d = opr.query_exercise("category="+cata)
     print(d)
 
 
@@ -65,21 +73,62 @@ def sreach(ui):
     if ui.keybtn.isChecked():
         by = 0
     if ui.codebtn.isChecked():
-        d = opr.inquire("exercise_base_info.ExerciseCode="+value)
+        d = opr.query_exercise("exercise_base_info.ExerciseCode="+value)
         print(d)
     if ui.catabtn.isChecked():
         cata = "'"+value+"'"
-        d = opr.inquire("category="+cata)
+        d = opr.query_exercise("category="+cata)
         print(d)
-        ui.outputtxt.set
+    print(d[["ExerciseCode","topic","answer"]])
 
+
+    ui.outputlist.clear()
+
+    for i in range(d.shape[0]):
+        ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+        #print(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+
+def remove_item(list):
+    if list.count()>0:
+        for i in range(list.count()):
+            item = list.item(i)
+            if item.isSelected():
+                code = int(str(list.item(i).text()).split()[0])
+
+                print("code:",code)
+
+                list.removeItemWidget(list.takeItem(i))
+                # 此处+对话框
+                opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+                opr.delete_exercise(code)
+
+def statistic_info():
+    bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+    pd.set_option('display.max_columns', None,
+                  'display.max_rows', None,
+                  'display.max_colwidth', None,
+                  'display.width', 100,
+                  'expand_frame_repr', False)
+    data = bop.statistic_exercise("difficulty")
+    print(data)
+    datalist = []
+    for i in range(len(data)):
+        datalist.append([str(data.iat[i,0]),int(data.iat[i,1])])
+    print(datalist)
+    return datalist
 
 def main():
+
     app = QApplication(sys.argv)
-    mainwin = mainWindow()
+
+    datalist = statistic_info()
+    mainwin = mainWindow(datalist)
     mainwin.show()
     mainwin.addui.submit.clicked.connect(partial(add, mainwin.addui))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
+    mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
+    mainwin.disbtm.clicked.connect(partial(mainwin.showall,statistic_info()))
+
     sys.exit(app.exec_())
 
 
