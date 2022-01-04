@@ -48,6 +48,7 @@ class DatabaseOperate:
         values = [','.join([topic, topic_picture, answer, answer_picture]),
                   ','.join([category, str(chapter), str(part), difficulty])]
         self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
 
     def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
         """
@@ -60,8 +61,29 @@ class DatabaseOperate:
         :return:
         """
         tables = ["paper"]
-        columns = ["chapter", "difficulty_high", "difficulty_middle", "difficulty_low"]
-        values = [chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low)]
+        columns = ["chapter, difficulty_high, difficulty_middle, difficulty_low"]
+        values = ["%s,%s,%s,%s" % (chapter, str(difficulty_high), str(difficulty_middle), str(difficulty_low))]
+        self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
+
+    def test_exercise(self, test_id, exercise_id):
+        """
+        select exercise to test
+
+        :param int test_id: the only representation of the paper
+        :param int exercise_id: the only representation of the exercise
+        :return:
+        """
+        tables = ["paper_exercise"]
+        columns = ["MAX(number)"]
+        conditions = ["where TestCode=%s" % test_id]
+        num = self.__dbt.query(tables, columns, conditions).iat[0, 0]
+        if num is None:
+            num = 1
+        else:
+            num += 1
+        columns = ["ExerciseCode, TestCode, number"]
+        values = ["%d,%d,%d" % (test_id, exercise_id, num)]
         self.__dbt.add(tables, columns, values)
 
     def delete_exercise(self, exercise_id):
@@ -196,9 +218,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-
-    print(bop.add_exercise("'ques'", "null", "'ans'", "null", "'填空'", 1, 1, "'低'"))
-
+    print(bop.test_exercise(1, 1))
 
 
 if __name__ == '__main__':
