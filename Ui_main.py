@@ -38,11 +38,13 @@ class mainWindow(QMainWindow):
         self.main_layout.addWidget(self.addwidget, 0, 1, 1, 6)
         self.main_layout.addWidget(self.mngwidget, 0, 1, 1, 6)
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
+        self.main_layout.addWidget(self.pdctwidget, 0, 1, 1, 6)
         # 将右侧窗口隐藏，避免重叠
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
+        self.pdctwidget.hide()
 
         self.setCentralWidget(self.main_widget)  # 设置窗口主部件
 
@@ -85,6 +87,7 @@ class mainWindow(QMainWindow):
         self.schbtm.clicked.connect(self.showsch)
         self.chgbtm.clicked.connect(self.showchg)
         self.mngbtm.clicked.connect(self.showmng)
+        self.pdctbtm.clicked.connect(self.showpdct)
 
 
 
@@ -111,6 +114,11 @@ class mainWindow(QMainWindow):
 
         self.allwidget = self.create_piechart(data)
         self.allwidget.setObjectName('allwidget')
+
+        self.pdctwidget = QWidget()
+        self.pdctwidget.setObjectName('pdctwidget')
+        self.pdctui = Ui_pdctForm()
+        self.pdctui.setupUi(self.pdctwidget)
 
     def create_piechart(self,ls):
         # 创建QPieSeries对象，它用来存放饼图的数据
@@ -160,6 +168,7 @@ class mainWindow(QMainWindow):
         self.chgwidget.hide()
         self.mngwidget.hide()
         self.allwidget.hide()
+        self.pdctwidget.hide()
 
     def showsch(self):
         self.addwidget.hide()
@@ -167,6 +176,7 @@ class mainWindow(QMainWindow):
         self.chgwidget.hide()
         self.mngwidget.hide()
         self.allwidget.hide()
+        self.pdctwidget.hide()
 
     def showchg(self):
         self.addwidget.hide()
@@ -174,6 +184,7 @@ class mainWindow(QMainWindow):
         self.chgwidget.show()
         self.mngwidget.hide()
         self.allwidget.hide()
+        self.pdctwidget.hide()
 
     def showmng(self):
         self.addwidget.hide()
@@ -181,12 +192,22 @@ class mainWindow(QMainWindow):
         self.chgwidget.hide()
         self.mngwidget.show()
         self.allwidget.hide()
+        self.pdctwidget.hide()
+
+    def showpdct(self):
+        self.addwidget.hide()
+        self.schwidget.hide()
+        self.chgwidget.hide()
+        self.mngwidget.hide()
+        self.allwidget.hide()
+        self.pdctwidget.show()
 
     def showall(self,data):
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
+        self.pdctwidget.hide()
 
         self.allwidget = self.create_piechart(data)
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
