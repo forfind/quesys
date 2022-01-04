@@ -85,7 +85,6 @@ class mainWindow(QMainWindow):
         self.schbtm.clicked.connect(self.showsch)
         self.chgbtm.clicked.connect(self.showchg)
         self.mngbtm.clicked.connect(self.showmng)
-        self.disbtm.clicked.connect(self.showall)
 
 
 
@@ -117,9 +116,8 @@ class mainWindow(QMainWindow):
         # 创建QPieSeries对象，它用来存放饼图的数据
         series = PyQt5.QtChart.QPieSeries()
         # append方法中的数字，代表的是权重，完成可以改成其它，如80,70,60等等
-        series.append("低", ls[0])
-        series.append("中", ls[1])
-        series.append("高", ls[2])
+        for i in range(len(ls)):
+            series.append(ls[i][0], ls[i][1])
 
         # 单独处理某个扇区
         slice = PyQt5.QtChart.QPieSlice()
@@ -184,11 +182,13 @@ class mainWindow(QMainWindow):
         self.mngwidget.show()
         self.allwidget.hide()
 
-    def showall(self):
+    def showall(self,data):
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
+        self.allwidget = self.create_piechart(data)
+        self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
 
 
