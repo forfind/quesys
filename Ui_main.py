@@ -117,7 +117,7 @@ class mainWindow(QMainWindow):
         series = PyQt5.QtChart.QPieSeries()
         # append方法中的数字，代表的是权重，完成可以改成其它，如80,70,60等等
         for i in range(len(ls)):
-            series.append(ls[i][0], ls[i][1])
+            series.append(str(ls[i][0])+":"+str(ls[i][1]), ls[i][1])
 
         # 单独处理某个扇区
         slice = PyQt5.QtChart.QPieSlice()
@@ -187,11 +187,10 @@ class mainWindow(QMainWindow):
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
+
         self.allwidget = self.create_piechart(data)
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
-
-
 
 def main():
     app = QApplication(sys.argv)
