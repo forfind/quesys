@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="da4281bb-b3c7-405c-a79f-cc528ca7e4bd" name="Changes" comment="试题生成界面跟随数据库变化">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ui_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ui_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -237,6 +238,11 @@
         <entry key="MAIN">
           <value>
             <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
               <option name="FILTERS">
                 <map>
                   <entry key="branch">
@@ -262,5 +268,16 @@
     <MESSAGE value="代码重构，解耦" />
     <MESSAGE value="试题生成界面跟随数据库变化" />
     <option name="LAST_COMMIT_MESSAGE" value="试题生成界面跟随数据库变化" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Ui_main.py</url>
+          <line>210</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

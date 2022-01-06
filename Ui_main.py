@@ -1,4 +1,5 @@
 import sys
+from functools import partial
 
 import PyQt5
 
@@ -87,6 +88,7 @@ class mainWindow(QMainWindow):
         self.chgbtn.clicked.connect(self.showchg)
         self.mngbtn.clicked.connect(self.showmng)
         self.pdctbtn.clicked.connect(self.showpdct)
+        self.disbtn.clicked.connect(partial(self.showall,[['测试',2]]))
 
     def init_right(self,data):
         self.addwidget = QWidget()
@@ -205,14 +207,17 @@ class mainWindow(QMainWindow):
         self.pdctwidget.show()
 
     def showall(self,data):
+
+        self.allwidget.hide()
         self.addwidget.hide()
         self.schwidget.hide()
         self.chgwidget.hide()
         self.mngwidget.hide()
         self.pdctwidget.hide()
 
+
         self.allwidget = self.create_piechart(data)
-        #self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
+        self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
 
     def set_pdctview(self,category_list,chapter_list):
@@ -254,6 +259,7 @@ class mainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     manuwin = mainWindow([['测试',1]])
+
     manuwin.show()
     sys.exit(app.exec_())
 

@@ -164,7 +164,7 @@ class Ui_pdctForm(object):
         self.range.setObjectName("range")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.range)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.chaplayout = QtWidgets.QGridLayout()
+        self.chaplayout = QtWidgets.QVBoxLayout()
         self.chaplayout.setObjectName("chaplayout")
         self.verticalLayout_5.addLayout(self.chaplayout)
         self.verticalLayout_2.addWidget(self.range)
@@ -212,7 +212,7 @@ class Ui_pdctForm(object):
         self.mcwid.hide()
         self.jswid.hide()
         self.tkwid.hide()
-
+        
         self.retranslateUi(pdctForm)
         QtCore.QMetaObject.connectSlotsByName(pdctForm)
 
