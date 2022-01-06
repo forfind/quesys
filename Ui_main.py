@@ -2,7 +2,7 @@ import sys
 
 import PyQt5
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox
 from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import Qt
@@ -15,10 +15,10 @@ from ui_change import *
 
 
 class mainWindow(QMainWindow):
+
     def __init__(self,data):
         super().__init__()
         self.init_ui(data)
-
 
     def init_ui(self,data):
 
@@ -48,7 +48,6 @@ class mainWindow(QMainWindow):
 
         self.setCentralWidget(self.main_widget)  # 设置窗口主部件
 
-
     def init_left(self):
         self.lwidget = QWidget()
         self.lwidget.setObjectName('lwidget')
@@ -56,40 +55,38 @@ class mainWindow(QMainWindow):
         self.llayout = QVBoxLayout()
         self.lwidget.setLayout(self.llayout)
 
-        self.addbtm = QtWidgets.QPushButton(self.lwidget)
-        self.addbtm.setObjectName("addbtm")
-        self.schbtm = QtWidgets.QPushButton(self.lwidget)
-        self.schbtm.setObjectName("findbtm")
-        self.chgbtm = QtWidgets.QPushButton(self.lwidget)
-        self.chgbtm.setObjectName("editbtm")
-        self.mngbtm = QtWidgets.QPushButton(self.lwidget)
-        self.mngbtm.setObjectName("mngbtm")
-        self.pdctbtm = QtWidgets.QPushButton(self.lwidget)
-        self.pdctbtm.setObjectName("probtm")
-        self.disbtm = QtWidgets.QPushButton(self.lwidget)
-        self.disbtm.setObjectName("disbtm")
+        self.addbtn = QtWidgets.QPushButton(self.lwidget)
+        self.addbtn.setObjectName("addbtn")
+        self.schbtn = QtWidgets.QPushButton(self.lwidget)
+        self.schbtn.setObjectName("findbtn")
+        self.chgbtn = QtWidgets.QPushButton(self.lwidget)
+        self.chgbtn.setObjectName("editbtn")
+        self.mngbtn = QtWidgets.QPushButton(self.lwidget)
+        self.mngbtn.setObjectName("mngbtn")
+        self.pdctbtn = QtWidgets.QPushButton(self.lwidget)
+        self.pdctbtn.setObjectName("probtn")
+        self.disbtn = QtWidgets.QPushButton(self.lwidget)
+        self.disbtn.setObjectName("disbtn")
 
         _translate = QtCore.QCoreApplication.translate
-        self.addbtm.setText(_translate("MainWindow", "添加题目"))
-        self.schbtm.setText(_translate("MainWindow", "检索题目"))
-        self.chgbtm.setText(_translate("MainWindow", "修改题目"))
-        self.mngbtm.setText(_translate("MainWindow", "试卷管理"))
-        self.pdctbtm.setText(_translate("MainWindow", "生成试卷"))
-        self.disbtm.setText(_translate("MainWindow", "试题统计"))
-        self.llayout.addWidget(self.addbtm)
-        self.llayout.addWidget(self.schbtm)
-        self.llayout.addWidget(self.chgbtm)
-        self.llayout.addWidget(self.mngbtm)
-        self.llayout.addWidget(self.pdctbtm)
-        self.llayout.addWidget(self.disbtm)
+        self.addbtn.setText(_translate("MainWindow", "添加题目"))
+        self.schbtn.setText(_translate("MainWindow", "检索题目"))
+        self.chgbtn.setText(_translate("MainWindow", "修改题目"))
+        self.mngbtn.setText(_translate("MainWindow", "试卷管理"))
+        self.pdctbtn.setText(_translate("MainWindow", "生成试卷"))
+        self.disbtn.setText(_translate("MainWindow", "试题统计"))
+        self.llayout.addWidget(self.addbtn)
+        self.llayout.addWidget(self.schbtn)
+        self.llayout.addWidget(self.chgbtn)
+        self.llayout.addWidget(self.mngbtn)
+        self.llayout.addWidget(self.pdctbtn)
+        self.llayout.addWidget(self.disbtn)
 
-        self.addbtm.clicked.connect(self.showadd)
-        self.schbtm.clicked.connect(self.showsch)
-        self.chgbtm.clicked.connect(self.showchg)
-        self.mngbtm.clicked.connect(self.showmng)
-        self.pdctbtm.clicked.connect(self.showpdct)
-
-
+        self.addbtn.clicked.connect(self.showadd)
+        self.schbtn.clicked.connect(self.showsch)
+        self.chgbtn.clicked.connect(self.showchg)
+        self.mngbtn.clicked.connect(self.showmng)
+        self.pdctbtn.clicked.connect(self.showpdct)
 
     def init_right(self,data):
         self.addwidget = QWidget()
@@ -119,6 +116,7 @@ class mainWindow(QMainWindow):
         self.pdctwidget.setObjectName('pdctwidget')
         self.pdctui = Ui_pdctForm()
         self.pdctui.setupUi(self.pdctwidget)
+        self.chaplist = []
 
     def create_piechart(self,ls):
         # 创建QPieSeries对象，它用来存放饼图的数据
@@ -160,7 +158,11 @@ class mainWindow(QMainWindow):
         # 创建ChartView，它是显示图表的控件
         chartview = PyQt5.QtChart.QChartView(chart)
         chartview.setRenderHint(QPainter.Antialiasing)
-        return chartview
+        re_layout = QGridLayout()
+        re_layout.addWidget(chartview)
+        re_wid = QWidget()
+        re_wid.setLayout(re_layout)
+        return re_wid
 
     def showadd(self):
         self.addwidget.show()
@@ -210,12 +212,48 @@ class mainWindow(QMainWindow):
         self.pdctwidget.hide()
 
         self.allwidget = self.create_piechart(data)
-        self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
+        #self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
+
+    def set_pdctview(self,category_list,chapter_list):
+        ui = self.pdctui
+
+        ui.sfwid.hide()
+        ui.pdwid.hide()
+        ui.xzwid.hide()
+        ui.wdwid.hide()
+        ui.mcwid.hide()
+        ui.jswid.hide()
+        ui.tkwid.hide()
+
+
+        for i in range(ui.chaplayout.count()):
+            print(ui.chaplayout.count())
+            ui.chaplayout.itemAt(i).widget().deleteLater()
+
+        for i in range(len(category_list)):
+            if category_list[i][0] == "判断":
+                ui.pdwid.show()
+            if category_list[i][0] == "填空":
+                ui.tkwid.show()
+            if category_list[i][0] == "名词解释":
+                ui.mcwid.show()
+            if category_list[i][0] == "计算":
+                ui.jswid.show()
+            if category_list[i][0] == "算法":
+                ui.sfwid.show()
+            if category_list[i][0] == "问答":
+                ui.wdwid.show()
+            if category_list[i][0] == "选择":
+                ui.xzwid.show()
+        for i in range(len(chapter_list)):
+            chap = chapter_list[i][0]
+            Chbox = QCheckBox("第"+chap+"章")
+            ui.chaplayout.addWidget(Chbox)
 
 def main():
     app = QApplication(sys.argv)
-    manuwin = mainWindow()
+    manuwin = mainWindow([['测试',1]])
     manuwin.show()
     sys.exit(app.exec_())
 

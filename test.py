@@ -82,7 +82,7 @@ class DatabaseOperate:
             num = 1
         else:
             num += 1
-        columns = ["ExerciseCode, TestCode, number"]
+        columns = ["TestCode, ExerciseCode, number"]
         values = ["%d,%d,%d" % (test_id, exercise_id, num)]
         self.__dbt.add(tables, columns, values)
 
@@ -195,6 +195,12 @@ class DatabaseOperate:
         conditions = [condition]
         return self.__dbt.query(tables, columns, conditions)
 
+    def query_exercise_from_paper(self, test_id):
+        tables = ["paper_exercise"]
+        columns = ["*"]
+        conditions = ["where TestCode=%d" % test_id]
+        return self.__dbt.query(tables,columns,conditions)
+
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
         Statistics the num of exercise
@@ -212,13 +218,22 @@ class DatabaseOperate:
 
 
 def main():
-    bop = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+    opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+
     pd.set_option('display.max_columns', None,
                   'display.max_rows', None,
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.test_exercise(1, 1))
+    category = opr.statistic_exercise("category")
+    print(category)
+    category_list = []
+    for i in range(len(category)):
+        if category.at[i,"num"] > 0 :
+            category_list.append(category.at[i,"category"])
+    print(category_list)
+    chapter = opr.statistic_exercise("chapter")
+    print(chapter)
 
 
 if __name__ == '__main__':
