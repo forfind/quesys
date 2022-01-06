@@ -255,50 +255,10 @@ class mainWindow(QMainWindow):
             Chbox = QCheckBox("第"+chap+"章")
             ui.chaplayout.addWidget(Chbox)
 
-def add(ui):
-    chap = int(ui.para1.text())
-    sec = int(ui.para2.text())
-    category = ''
-    diff = ''
-    if ui.category_1.isChecked():
-        category = "'选择'"
-    if ui.category_2.isChecked():
-        category = "'判断'"
-    if ui.category_3.isChecked():
-        category = "'填空'"
-    if ui.category_4.isChecked():
-        category = "'名词解释'"
-    if ui.category_5.isChecked():
-        category = "'问答'"
-    if ui.category_6.isChecked():
-        category = "'算法'"
-    if ui.category_7.isChecked():
-        category = "'计算'"
-    if ui.diff_1.isChecked():
-        diff = "'低'"
-    if ui.diff_2.isChecked():
-        diff = "'高'"
-    if ui.diff_3.isChecked():
-        diff = "'中'"
-
-    ques = "'" + ui.ctt_1.toPlainText() + "'"
-    ans = "'" + ui.ctt_2.toPlainText() + "'"
-    print("章：", chap, "节:", sec, "类别:", category, "难度:", diff)
-    print("题目", ques, "答案", ans)
-
-    #global opr
-    #opr.add_exercise(ques, "null", ans, "null", category, chap, sec, diff)
-
-
-def add1(ui):
-    print(ui.ctt_1.toPlainText())
 
 def main():
     app = QApplication(sys.argv)
-    mainwin = mainWindow([['测试',1]])
-    mainwin.addui.submit.clicked.connect(partial(add1, mainwin.addui))
-
-
+    mainwin = mainWindow([['测试',1],['测试',2]])
     mainwin.show()
     sys.exit(app.exec_())
 

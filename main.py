@@ -62,25 +62,24 @@ def add(ui):
 
 def sreach(ui):
     global opr
-    pd.set_option('display.max_columns', None,
-              'display.max_rows', None,
-              'display.max_colwidth', None,
-              'display.width', 100,
-              'expand_frame_repr', False)
     value = ui.inputtxt.toPlainText()
+    numls = []
+    ui.outputlist.clear()
     if ui.keybtn.isChecked():
-        by = 0
+        d = opr.query_exercise("all")
+        for i in range(d.shape[0]):
+            if value  in d.at[i,"topic"]:
+                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+        return
     if ui.codebtn.isChecked():
         d = opr.query_exercise("exercise_base_info.ExerciseCode="+value)
         print(d)
+
     if ui.catabtn.isChecked():
         cata = "'"+value+"'"
         d = opr.query_exercise("category="+cata)
         print(d)
     print(d[["ExerciseCode","topic","answer"]])
-
-
-    ui.outputlist.clear()
 
     for i in range(d.shape[0]):
         ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
@@ -100,11 +99,6 @@ def remove_item(list):
                 list.removeItemWidget(list.takeItem(i))
                 # 此处+对话框
                 global opr
-                pd.set_option('display.max_columns', None,
-                    'display.max_rows', None,
-                    'display.max_colwidth', None,
-                    'display.width', 100,
-                    'expand_frame_repr', False)
                 opr.delete_exercise(code)
                 break
 def Df2Ls(data):
