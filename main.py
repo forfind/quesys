@@ -111,10 +111,19 @@ def Df2Ls(data):
 
 def statistic_info():
     global opr
+    datalist = []
     data = opr.statistic_exercise("difficulty")
-    print(data)
-    datalist = Df2Ls(data)
-    print(datalist)
+    #print(data)
+    datalist.append(Df2Ls(data))
+    #print(datalist)
+    data = opr.statistic_exercise("category")
+    #print(data)
+    datalist.append(Df2Ls(data))
+    #print(datalist)
+    data = opr.statistic_exercise("chapter")
+    #print(data)
+    datalist.append(Df2Ls(data))
+    #print(datalist)
     return datalist
 
 def updata_info(win):
@@ -234,7 +243,7 @@ def manage_paper(ui):
 
     paper_data = opr.query_paper("all")
     print(paper_data)
-    
+
     for i in range(paper_data.shape[0]):
         ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
 

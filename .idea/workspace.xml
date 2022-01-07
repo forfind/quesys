@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="da4281bb-b3c7-405c-a79f-cc528ca7e4bd" name="Changes" comment="试题生成界面跟随数据库变化">
-      <change afterPath="$PROJECT_DIR$/ui_mng.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Ui_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ui_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database_operate.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_operate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_pdct.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_pdct.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

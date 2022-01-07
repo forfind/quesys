@@ -112,7 +112,7 @@ class mainWindow(QMainWindow):
         self.mngui.setupUi(self.mngwidget)
         self.mngui.editwid.hide()
 
-        self.allwidget = self.create_piechart(data)
+        self.allwidget = self.getview(data)
         self.allwidget.setObjectName('allwidget')
 
         self.pdctwidget = QWidget()
@@ -151,7 +151,7 @@ class mainWindow(QMainWindow):
         chart.setAnimationOptions(PyQt5.QtChart.QChart.SeriesAnimations)
 
         # 设置标题
-        chart.setTitle("题库试题难度分布")
+        chart.setTitle("题库试题分布")
 
         chart.legend().setVisible(True)
 
@@ -161,9 +161,20 @@ class mainWindow(QMainWindow):
         # 创建ChartView，它是显示图表的控件
         chartview = PyQt5.QtChart.QChartView(chart)
         chartview.setRenderHint(QPainter.Antialiasing)
-        re_layout = QGridLayout()
-        re_layout.addWidget(chartview)
+        return chartview
+
+    def getview(self,data):
         re_wid = QWidget()
+        re_layout = QGridLayout()
+        for i in range(len(data)):
+            chartview = self.create_piechart(data[i])
+            if i == 0:
+                re_layout.addWidget(chartview,0,0,1,1)
+            elif i == 1:
+                re_layout.addWidget(chartview,1,0,1,2)
+            else:
+                re_layout.addWidget(chartview,0,1,1,1)
+
         re_wid.setLayout(re_layout)
         return re_wid
 
@@ -217,7 +228,7 @@ class mainWindow(QMainWindow):
         self.pdctwidget.hide()
 
 
-        self.allwidget = self.create_piechart(data)
+        self.allwidget = self.getview(data)
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
 
