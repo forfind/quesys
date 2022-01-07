@@ -226,14 +226,18 @@ def main():
                   'display.width', 100,
                   'expand_frame_repr', False)
 
+    add = opr.add_paper("'1,2,3'",0.1,0.8,0.1)
+    print(add)
+    paper = opr.query_paper("all")
+    print(paper)
+    '''
     for chap in [1,2,3,4,5,7]:
         for category in ["'名词解释'","'问答'","'算法'","'计算'"]:
             for diff in ["'低'","'高'","'中'"]:
                 for i in range(10):
                     print(chap,category,diff,i)
                     opr.add_exercise("'"+"测试用例|"+diff[1:-1]+"|CHAP"+str(chap)+"|"+category[1:-1]+"|ques"+str(i)+"'", "null", "'ans"+str(i)+"'", "null", category, chap, i, diff)
-
-
+    '''
 
 if __name__ == '__main__':
     main()

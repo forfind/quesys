@@ -219,7 +219,7 @@ class mainWindow(QMainWindow):
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
 
-    def set_pdctview(self,category_list,chapter_list):
+    def set_pdctview(self, category_list, chapter_list):
         ui = self.pdctui
 
         ui.sfwid.hide()
@@ -230,6 +230,13 @@ class mainWindow(QMainWindow):
         ui.jswid.hide()
         ui.tkwid.hide()
 
+        ui.xz.setChecked(False)
+        ui.mc.setChecked(False)
+        ui.tk.setChecked(False)
+        ui.sf.setChecked(False)
+        ui.js.setChecked(False)
+        ui.wd.setChecked(False)
+        ui.pd.setChecked(False)
 
         for i in range(ui.chaplayout.count()):
             print(ui.chaplayout.count())
@@ -252,13 +259,15 @@ class mainWindow(QMainWindow):
                 ui.xzwid.show()
         for i in range(len(chapter_list)):
             chap = chapter_list[i][0]
-            Chbox = QCheckBox("第"+chap+"章")
+            Chbox = QCheckBox("第"+chap+"章",parent=ui.range)
             ui.chaplayout.addWidget(Chbox)
 
 
 def main():
     app = QApplication(sys.argv)
     mainwin = mainWindow([['测试',1],['测试',2]])
+    mainwin.set_pdctview(["选择"],[["1",1],["2",5]])
+    print(mainwin.pdctui.range.children())
     mainwin.show()
     sys.exit(app.exec_())
 
