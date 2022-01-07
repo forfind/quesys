@@ -100,9 +100,9 @@ def remove_item(list):
 
                 list.removeItemWidget(list.takeItem(i))
                 # 此处+对话框
-                global opr
                 opr.delete_exercise(code)
                 break
+
 def Df2Ls(data):
     datalist = []
     for i in range(len(data)):
@@ -127,38 +127,46 @@ def create_paper(ui):
         ca_num = []
         ca_num.append("'选择'")
         ca_num.append(int(ui.xznum.text()))
+        ca_num.append(int(ui.xzpoint.text()))
         cate.append(ca_num)
 
     if ui.tk.isChecked():
         ca_num = []
         ca_num.append("'填空'")
         ca_num.append(int(ui.tknum.text()))
+        ca_num.append(int(ui.tkpoint.text()))
         cate.append(ca_num)
     if ui.sf.isChecked():
         ca_num = []
         ca_num.append("'算法'")
         ca_num.append(int(ui.sfnum.text()))
+        ca_num.append(int(ui.sfpoint.text()))
         cate.append(ca_num)
     if ui.js.isChecked():
         ca_num = []
         ca_num.append("'计算'")
         ca_num.append(int(ui.jsnum.text()))
+        ca_num.append(int(ui.jspoint.text()))
         cate.append(ca_num)
     if ui.mc.isChecked():
         ca_num = []
         ca_num.append("'名词解释'")
         ca_num.append(int(ui.mcnum.text()))
+        ca_num.append(int(ui.mcpoint.text()))
         cate.append(ca_num)
     if ui.pd.isChecked():
         ca_num = []
         ca_num.append("'判断'")
         ca_num.append(int(ui.pdnum.text()))
+        ca_num.append(int(ui.pdpoint.text()))
         cate.append(ca_num)
     if ui.wd.isChecked():
         ca_num = []
         ca_num.append("'问答'")
         ca_num.append(int(ui.wdnum.text()))
+        ca_num.append(int(ui.wdpoint.text()))
         cate.append(ca_num)
+
     chap=[]
     for wid in ui.range.children():
         if isinstance(wid, QCheckBox):
@@ -192,9 +200,11 @@ def create_paper_with(cate,chap,diff):
         catenum = cate[i_ca][1]
         highnum = int(catenum*diff[0])
         lownum = int(catenum*diff[1])
-        final.extend(random.sample(ca_diff[0],highnum))
-        final.extend(random.sample(ca_diff[1],catenum-highnum-lownum))
-        final.extend(random.sample(ca_diff[2],lownum))
+        onecate = []
+        onecate.extend(random.sample(ca_diff[0],highnum))
+        onecate.extend(random.sample(ca_diff[1],catenum-highnum-lownum))
+        onecate.extend(random.sample(ca_diff[2],lownum))
+        final.append(onecate)
         print(final)
     print(final)
     #def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low)
@@ -202,8 +212,9 @@ def create_paper_with(cate,chap,diff):
     print(chstr,float(diff[0]),float(1-diff[0]-diff[1]),float(diff[1]))
     NewPaperId = opr.add_paper("'"+chstr+"'",float(diff[0]),float(1-diff[0]-diff[1]),float(diff[1]))
     print(NewPaperId)
-    for ExcerciseCode in final:
-        opr.test_exercise(NewPaperId, ExcerciseCode)
+    for i in range(len(final)):
+        for ExcerciseCode in final[i]:
+            opr.test_exercise(NewPaperId, ExcerciseCode,cate[i][2])
 
 def set_pdctview(win):
     category = opr.statistic_exercise("category")
@@ -212,6 +223,61 @@ def set_pdctview(win):
     chapter_list = Df2Ls(chapter)
 
     win.set_pdctview(category_list,chapter_list)
+
+
+def manage_paper(ui):
+    global opr
+
+    ui.mngwid.show()
+    ui.editwid.hide()
+    ui.paperlist.clear()
+
+    paper_data = opr.query_paper("all")
+    print(paper_data)
+    
+    for i in range(paper_data.shape[0]):
+        ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
+
+
+def remove_paper(list):
+    global opr
+    if list.count() > 0:
+        for i in range(list.count()):
+            item = list.item(i)
+            if item.isSelected():
+                code = int(str(list.item(i).text()).split()[1])
+
+                print("code:",code)
+
+                list.removeItemWidget(list.takeItem(i))
+                # 此处+对话框
+                global opr
+                opr.delete_paper(code)
+                break
+
+def check_paper(ui):
+    global opr
+    list = ui.paperlist
+    if list.count() > 0:
+        for i in range(list.count()):
+            item = list.item(i)
+            # 选择被选中的试卷
+            if item.isSelected():
+                codestr = str(list.item(i).text()).split()[1]
+                code = int(codestr)
+                print("code:",code)
+
+                ui.mngwid.hide()
+                ui.editwid.show()
+                ui.paperlist.clear()
+                ques_data = opr.query_exercise_from_paper(code)
+                print(ques_data)
+                for i in range(ques_data.shape[0]):
+                    print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(ques_data.at[i,"point"]))
+                    ui.paperlist.addItem("编号 "+str(ques_data.at[i,"ExerciseCode"])+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"]))
+                break
+
+
 
 def main():
     app = QApplication(sys.argv)
@@ -225,7 +291,11 @@ def main():
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
     mainwin.disbtn.clicked.connect(partial(updata_info,mainwin))
     mainwin.pdctbtn.clicked.connect(partial(set_pdctview,mainwin))
-    mainwin.pdctui.pushButton.clicked.connect(partial(create_paper,mainwin.pdctui))
+    mainwin.pdctui.crtbtn.clicked.connect(partial(create_paper,mainwin.pdctui))
+    mainwin.mngbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
+    mainwin.mngui.delbtn.clicked.connect(partial(remove_paper,mainwin.mngui.paperlist))
+    mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
+    mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
 
     sys.exit(app.exec_())
 

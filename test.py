@@ -66,7 +66,7 @@ class DatabaseOperate:
         self.__dbt.add(tables, columns, values)
         return self.__dbt.get_last_id()
 
-    def test_exercise(self, test_id, exercise_id):
+    def test_exercise(self, test_id, exercise_id, point):
         """
         select exercise to test
 
@@ -82,8 +82,8 @@ class DatabaseOperate:
             num = 1
         else:
             num += 1
-        columns = ["TestCode, ExerciseCode, number"]
-        values = ["%d,%d,%d" % (test_id, exercise_id, num)]
+        columns = ["TestCode, ExerciseCode, number, point"]
+        values = ["%d,%d,%d,%s" % (test_id, exercise_id, num, str(point))]
         self.__dbt.add(tables, columns, values)
 
     def delete_exercise(self, exercise_id):
@@ -218,18 +218,23 @@ class DatabaseOperate:
 
 
 def main():
-    opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
-
     pd.set_option('display.max_columns', None,
                   'display.max_rows', None,
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
+    opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+    opr.test_exercise(1,170,2)
+    ques_data = opr.query_exercise_from_paper(1)
+    print(ques_data)
 
+    '''
     add = opr.add_paper("'1,2,3'",0.1,0.8,0.1)
     print(add)
     paper = opr.query_paper("all")
     print(paper)
+    '''
+
     '''
     for chap in [1,2,3,4,5,7]:
         for category in ["'名词解释'","'问答'","'算法'","'计算'"]:

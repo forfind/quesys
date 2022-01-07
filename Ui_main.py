@@ -3,16 +3,17 @@ from functools import partial
 
 import PyQt5
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox, QGroupBox
 from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import Qt
 
-
+from database_operate import DatabaseOperate
 from ui_Qedit import *
 from ui_pdct import *
 from ui_sch import *
 from ui_change import *
+from ui_mng import *
 
 
 class mainWindow(QMainWindow):
@@ -107,8 +108,9 @@ class mainWindow(QMainWindow):
 
         self.mngwidget = QWidget()
         self.mngwidget.setObjectName('mngwidget')
-        #self.mngui = Ui_mngForm()
-        #self.mngui.setupUi(self.mngwidget)
+        self.mngui = Ui_mngForm()
+        self.mngui.setupUi(self.mngwidget)
+        self.mngui.editwid.hide()
 
         self.allwidget = self.create_piechart(data)
         self.allwidget.setObjectName('allwidget')
@@ -262,12 +264,36 @@ class mainWindow(QMainWindow):
             Chbox = QCheckBox("第"+chap+"章",parent=ui.range)
             ui.chaplayout.addWidget(Chbox)
 
+def check_paper(ui):
+    list = ui.paperlist
+    print(list)
+    if list.count() > 0:
+        for i in range(list.count()):
+            item = list.item(i)
+            # 选择被选中的试卷
+            if item.isSelected():
+                codestr = str(list.item(i).text()).split()[1]
+                code = int(codestr)
+                print("code:",code)
+
+                ui.mngwid.hide()
+                ui.editwid.show()
+                ui.paperlist.clear()
+                opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
+                ques_data = opr.query_exercise_from_paper(code)
+                print(ques_data)
+                for i in range(ques_data.shape[0]):
+                    print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(ques_data.at[i,"point"]))
+                    ui.paperlist.addItem("编号 "+str(ques_data.at[i,"ExerciseCode"])+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"]))
+                break
 
 def main():
     app = QApplication(sys.argv)
     mainwin = mainWindow([['测试',1],['测试',2]])
     mainwin.set_pdctview(["选择"],[["1",1],["2",5]])
-    print(mainwin.pdctui.range.children())
+
+    mainwin.mngui.paperlist.addItem("1 8 3")
+    mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
     mainwin.show()
     sys.exit(app.exec_())
 
