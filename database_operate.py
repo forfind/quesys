@@ -165,7 +165,7 @@ class DatabaseOperate:
         """
         tables = ["paper_exercise"]
         contents = ["point=%f" % point]
-        conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
+        conditions = ["ExerciseCode=%d and TestCode=%d" % (exercise_id, test_id)]
         self.__dbt.update(tables, contents, conditions)
 
     def update_user(self, id, password):
