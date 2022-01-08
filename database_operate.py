@@ -140,7 +140,7 @@ class DatabaseOperate:
             if key in self.__exercise_base:
                 update_base += [key + '=' + value]
                 if "exercise_base_info" not in tables:
-                    tables.append("exercise_base_info")
+                    tables.insert(0, "exercise_base_info")
                 conditions.append("ExerciseCode=%d" % exercise_id)
             if key in self.__exercise_extra:
                 update_extra += [key + '=' + value]
@@ -165,7 +165,7 @@ class DatabaseOperate:
         """
         tables = ["paper_exercise"]
         contents = ["point=%f" % point]
-        conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
+        conditions = ["ExerciseCode=%d and TestCode=%d" % (exercise_id, test_id)]
         self.__dbt.update(tables, contents, conditions)
 
     def update_user(self, id, password):
@@ -265,11 +265,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-
-    print(bop.query_user())
-
-    #print(bop.update_exercise(275, ["chapter"], ["5"]))
-
+    print(bop.update_exercise(275, ['difficulty', 'topic', 'answer'], ["'中'", "'aaaaa'", "'ans2'"]))
 
 
 if __name__ == '__main__':
