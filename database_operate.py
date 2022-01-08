@@ -55,9 +55,9 @@ class DatabaseOperate:
         add paper
 
         :param str chapter: range of paper
-        :param double difficulty_high: percentage of high exercise
-        :param double difficulty_middle: percentage of middle exercise
-        :param double difficulty_low: percentage of low exercise
+        :param float difficulty_high: percentage of high exercise
+        :param float difficulty_middle: percentage of middle exercise
+        :param float difficulty_low: percentage of low exercise
         :return:
         """
         tables = ["paper"]
@@ -135,8 +135,22 @@ class DatabaseOperate:
                     tables.append("exercise_extra_info")
                 conditions.append("ExerciseCode=%d" % exercise_id)
 
-        content = [','.join(update_base), ','.join(update_extra)]
-        self.__dbt.update(tables, content, conditions)
+        contents = [','.join(update_base), ','.join(update_extra)]
+        self.__dbt.update(tables, contents, conditions)
+
+    def update_num(self, test_id, exercise_id, number):
+        """
+        update number by test_id,exercise_id
+
+        :param int test_id: the only representation of the paper
+        :param int exercise_id: the only representation of the exercise
+        :param float number: point
+        :return:
+        """
+        tables = ["paper_exercise"]
+        contents = ["number=%f" % number]
+        conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
+        self.__dbt.update(tables, contents, conditions)
 
     def query_exercise(self, condition) -> pd.DataFrame:
         """
@@ -199,7 +213,7 @@ class DatabaseOperate:
         tables = ["paper_exercise"]
         columns = ["*"]
         conditions = ["where TestCode=%d" % test_id]
-        return self.__dbt.query(tables,columns,conditions)
+        return self.__dbt.query(tables, columns, conditions)
 
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
@@ -224,7 +238,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.query_exercise_from_paper(1))
+    print(bop.add_paper("'1,2,3'", 0.1, 0.8, 0.1))
 
 
 if __name__ == '__main__':
