@@ -66,6 +66,13 @@ class DatabaseOperate:
         self.__dbt.add(tables, columns, values)
         return self.__dbt.get_last_id()
 
+    def add_user(self, name, password):
+        tables = ["user"]
+        columns = ["name, password"]
+        values = ["%s, %s" % (name, password)]
+        self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
+
     def test_exercise(self, test_id, exercise_id):
         """
         select exercise to test
@@ -107,6 +114,11 @@ class DatabaseOperate:
         tables = ["paper"]
         conditions = ["TestCode = %d" % test_id]
         self.__dbt.delete(tables, conditions)
+
+    def delete_user(self, id):
+        tables = ["user"]
+        conditions = ["id = %d" % id]
+        self.__dbt.delete((tables, conditions))
 
     def update_exercise(self, exercise_id, columns, values):
         """
@@ -153,6 +165,12 @@ class DatabaseOperate:
         tables = ["paper_exercise"]
         contents = ["point=%f" % point]
         conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
+        self.__dbt.update(tables, contents, conditions)
+
+    def update_user(self, id, password):
+        tables = ["user"]
+        contents = ["password = %d" % password]
+        conditions = ["id = %d" % id]
         self.__dbt.update(tables, contents, conditions)
 
     def query_exercise(self, condition) -> pd.DataFrame:
@@ -218,6 +236,11 @@ class DatabaseOperate:
         conditions = ["where TestCode=%d" % test_id]
         return self.__dbt.query(tables, columns, conditions)
 
+    def query_user(self):
+        tables = ["user"]
+        columns = ["id, name"]
+        return self.__dbt.query(tables, columns, [''])
+
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
         Statistics the num of exercise
@@ -241,7 +264,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.update_exercise(275, ["chapter"], ["5"]))
+    print(bop.query_user())
 
 
 if __name__ == '__main__':
