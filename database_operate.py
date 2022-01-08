@@ -138,17 +138,17 @@ class DatabaseOperate:
         contents = [','.join(update_base), ','.join(update_extra)]
         self.__dbt.update(tables, contents, conditions)
 
-    def update_num(self, test_id, exercise_id, number):
+    def update_point(self, test_id, exercise_id, point):
         """
         update number by test_id,exercise_id
 
         :param int test_id: the only representation of the paper
         :param int exercise_id: the only representation of the exercise
-        :param float number: point
+        :param float point: point
         :return:
         """
         tables = ["paper_exercise"]
-        contents = ["number=%f" % number]
+        contents = ["point=%f" % point]
         conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
         self.__dbt.update(tables, contents, conditions)
 
