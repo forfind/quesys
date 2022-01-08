@@ -15,6 +15,8 @@ pd.set_option('display.max_columns', None,
               'display.max_colwidth', None,
               'display.width', 100,
               'expand_frame_repr', False)
+POINT = 0
+TEST_ID = 0
 
 def test(ui):
     cata = ''
@@ -81,7 +83,7 @@ def sreach(ui):
         cata = "'"+value+"'"
         d = opr.query_exercise("category="+cata)
         print(d)
-    print(d[["ExerciseCode","topic","answer"]])
+    #print(d[["ExerciseCode","topic","answer"]])
 
     for i in range(d.shape[0]):
         ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
@@ -145,17 +147,11 @@ def create_paper(ui):
         ca_num.append(int(ui.tknum.text()))
         ca_num.append(int(ui.tkpoint.text()))
         cate.append(ca_num)
-    if ui.sf.isChecked():
+    if ui.pd.isChecked():
         ca_num = []
-        ca_num.append("'算法'")
-        ca_num.append(int(ui.sfnum.text()))
-        ca_num.append(int(ui.sfpoint.text()))
-        cate.append(ca_num)
-    if ui.js.isChecked():
-        ca_num = []
-        ca_num.append("'计算'")
-        ca_num.append(int(ui.jsnum.text()))
-        ca_num.append(int(ui.jspoint.text()))
+        ca_num.append("'判断'")
+        ca_num.append(int(ui.pdnum.text()))
+        ca_num.append(int(ui.pdpoint.text()))
         cate.append(ca_num)
     if ui.mc.isChecked():
         ca_num = []
@@ -163,17 +159,23 @@ def create_paper(ui):
         ca_num.append(int(ui.mcnum.text()))
         ca_num.append(int(ui.mcpoint.text()))
         cate.append(ca_num)
-    if ui.pd.isChecked():
-        ca_num = []
-        ca_num.append("'判断'")
-        ca_num.append(int(ui.pdnum.text()))
-        ca_num.append(int(ui.pdpoint.text()))
-        cate.append(ca_num)
     if ui.wd.isChecked():
         ca_num = []
         ca_num.append("'问答'")
         ca_num.append(int(ui.wdnum.text()))
         ca_num.append(int(ui.wdpoint.text()))
+        cate.append(ca_num)
+    if ui.js.isChecked():
+        ca_num = []
+        ca_num.append("'计算'")
+        ca_num.append(int(ui.jsnum.text()))
+        ca_num.append(int(ui.jspoint.text()))
+        cate.append(ca_num)
+    if ui.sf.isChecked():
+        ca_num = []
+        ca_num.append("'算法'")
+        ca_num.append(int(ui.sfnum.text()))
+        ca_num.append(int(ui.sfpoint.text()))
         cate.append(ca_num)
 
     chap=[]
@@ -265,7 +267,7 @@ def remove_paper(list):
                 break
 
 def check_paper(ui):
-    global opr
+    global opr,TEST_ID
     list = ui.paperlist
     if list.count() > 0:
         for i in range(list.count()):
@@ -274,19 +276,191 @@ def check_paper(ui):
             if item.isSelected():
                 codestr = str(list.item(i).text()).split()[1]
                 code = int(codestr)
+                TEST_ID = code
                 print("code:",code)
 
                 ui.mngwid.hide()
                 ui.editwid.show()
                 ui.paperlist.clear()
                 ques_data = opr.query_exercise_from_paper(code)
+                ques_data = ques_data.sort_values(by="number",ascending=True)
+                ques_data = ques_data.reset_index(drop = True)
                 print(ques_data)
+                point = ques_data.at[i,"point"]
                 for i in range(ques_data.shape[0]):
-                    print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(ques_data.at[i,"point"]))
-                    ui.paperlist.addItem("编号 "+str(ques_data.at[i,"ExerciseCode"])+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"]))
+                    excercisecode = ques_data.at[i,"ExerciseCode"]
+                    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(excercisecode))
+                    print(detail_data)
+                    print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(point))
+                    ui.paperlist.addItem("编号 "+str(excercisecode)+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"])+'\t'+str(detail_data.at[0,"topic"])+"\t"+str(detail_data.at[0,"answer"]))
+
                 break
 
 
+def edit_ques(win):
+    list = win.mngui.paperlist
+    code = 0
+    global POINT
+    if list.count() > 0:
+        for i in range(list.count()):
+            item = list.item(i)
+            if item.isSelected():
+                code = int(str(list.item(i).text()).split()[1])
+                POINT = float(str(list.item(i).text()).split()[5])
+                break
+    print("code",code)
+    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
+    print(detail_data)
+    win.showchg()
+    ui = win.chgui
+    ui.codelabel.setText("试题详情-题号："+str(code))
+    ui.point.setText(str(POINT))
+
+    cate = detail_data.at[0,"category"]
+    diff = detail_data.at[0,"difficulty"]
+    
+    ui.para1.setValue(detail_data.at[0,"chapter"])
+    ui.para2.setValue(detail_data.at[0,"part"])
+    ui.ctt_1.setPlainText(detail_data.at[0,"topic"])
+    ui.ctt_2.setPlainText(detail_data.at[0,"answer"])
+    print(cate)
+    if cate == '选择':
+        ui.cata_1.setChecked(True)
+    elif cate == '判断':
+        ui.cata_2.setChecked(True)
+    elif cate == '填空':
+        ui.cata_3.setChecked(True)
+    elif cate == '名词解释':
+        ui.cata_4.setChecked(True)
+    elif cate == '问答':
+        ui.cata_5.setChecked(True)
+    elif cate == '算法':
+        ui.cata_6.setChecked(True)
+    elif cate == '计算':
+        ui.cata_7.setChecked(True)
+
+    if diff == "低":
+        ui.diff_1.setChecked(True)
+    elif diff == "高":
+        ui.diff_2.setChecked(True)
+    elif diff == "中":
+        ui.diff_3.setChecked(True)
+
+
+def save_edit(ui):
+
+    global opr
+    global POINT,TEST_ID
+
+    code = int(ui.codelabel.text()[8:])
+    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
+    print(detail_data)
+    or_cate = "'"+detail_data.at[0,"category"]+"'"
+    or_diff = "'"+detail_data.at[0,"difficulty"]+"'"
+
+    or_chap=detail_data.at[0,"chapter"]
+    or_sec=detail_data.at[0,"part"]
+    or_ques="'"+detail_data.at[0,"topic"]+"'"
+    or_ans="'"+detail_data.at[0,"answer"]+"'"
+    or_point = POINT
+    point = float(ui.point.text())
+    if or_point != point:
+        opr.update_point(TEST_ID,code,POINT)
+    print("or_point",or_point)
+
+    chap = int(ui.para1.text())
+    sec = int(ui.para2.text())
+    cate = ''
+    diff = ''
+    if ui.cata_1.isChecked():
+        cate = "'选择'"
+    if ui.cata_2.isChecked():
+        cate = "'判断'"
+    if ui.cata_3.isChecked():
+        cate = "'填空'"
+    if ui.cata_4.isChecked():
+        cate = "'名词解释'"
+    if ui.cata_5.isChecked():
+        cate = "'问答'"
+    if ui.cata_6.isChecked():
+        cate = "'算法'"
+    if ui.cata_7.isChecked():
+        cate = "'计算'"
+    if ui.diff_1.isChecked():
+        diff = "'低'"
+    if ui.diff_2.isChecked():
+        diff = "'高'"
+    if ui.diff_3.isChecked():
+        diff = "'中'"
+
+    ques = "'" + ui.ctt_1.toPlainText() + "'"
+    ans = "'" + ui.ctt_2.toPlainText() + "'"
+    print("章：", chap, "节:", sec, "类别:", cate, "难度:", diff)
+    print("题目", ques, "答案", ans)
+    print("章：", or_chap, "节:", or_sec, "类别:", or_cate, "难度:", or_diff)
+    print("题目", or_ques, "答案", or_ans)
+    #ques, "null", ans, "null", category, chap, sec, diff
+    clms=[]
+    val=[]
+
+    if or_chap != chap:
+        clms,val =[],[]
+        clms.append("chapter")
+        val.append(str(chap))
+        opr.update_exercise(code,clms,val)
+    if or_sec != sec:
+        clms,val =[],[]
+        clms.append("part")
+        val.append(str(sec))
+        opr.update_exercise(code,clms,val)
+    if or_cate != cate:
+        clms,val =[],[]
+        clms.append("category")
+        val.append(cate)
+        opr.update_exercise(code,clms,val)
+    if or_diff != diff:
+        clms,val =[],[]
+        clms.append("difficulty")
+        val.append(diff)
+        opr.update_exercise(code,clms,val)
+    if or_ques != ques:
+        clms,val =[],[]
+        clms.append("topic")
+        val.append(ques)
+        opr.update_exercise(code,clms,val)
+    if or_ans != ans:
+        clms,val =[],[]
+        clms.append("answer")
+        val.append(ans)
+        opr.update_exercise(code,clms,val)
+
+
+    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
+    print(detail_data)
+    '''
+    if or_chap != chap:
+        clms.append("chapter")
+        val.append(str(chap))
+    if or_sec != sec:
+        clms.append("part")
+        val.append(str(sec))
+    if or_cate != cate:
+        clms.append("category")
+        val.append(cate)
+    if or_diff != diff:
+        clms.append("difficulty")
+        val.append(diff)
+    if or_ques != ques:
+        clms.append("topic")
+        val.append(ques)
+    if or_ans != ans:
+        clms.append("answer")
+        val.append(ans)
+    print(clms,val)
+    opr.update_exercise(code,clms,val)
+    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
+    print(detail_data)
+    '''
 
 def main():
     app = QApplication(sys.argv)
@@ -305,6 +479,8 @@ def main():
     mainwin.mngui.delbtn.clicked.connect(partial(remove_paper,mainwin.mngui.paperlist))
     mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
     mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
+    mainwin.mngui.chgbtn.clicked.connect(partial(edit_ques,mainwin))
+    mainwin.chgui.submit.clicked.connect(partial(save_edit,mainwin.chgui))
 
     sys.exit(app.exec_())
 

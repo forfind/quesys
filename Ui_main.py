@@ -105,6 +105,7 @@ class mainWindow(QMainWindow):
         self.chgwidget.setObjectName('chgwidget')
         self.chgui = Ui_chgForm()
         self.chgui.setupUi(self.chgwidget)
+        self.chgui.backbtn.clicked.connect(self.showmng)
 
         self.mngwidget = QWidget()
         self.mngwidget.setObjectName('mngwidget')

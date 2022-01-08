@@ -55,9 +55,9 @@ class DatabaseOperate:
         add paper
 
         :param str chapter: range of paper
-        :param double difficulty_high: percentage of high exercise
-        :param double difficulty_middle: percentage of middle exercise
-        :param double difficulty_low: percentage of low exercise
+        :param float difficulty_high: percentage of high exercise
+        :param float difficulty_middle: percentage of middle exercise
+        :param float difficulty_low: percentage of low exercise
         :return:
         """
         tables = ["paper"]
@@ -66,7 +66,15 @@ class DatabaseOperate:
         self.__dbt.add(tables, columns, values)
         return self.__dbt.get_last_id()
 
+    def add_user(self, name, password):
+        tables = ["user"]
+        columns = ["name, password"]
+        values = ["%s, %s" % (name, password)]
+        self.__dbt.add(tables, columns, values)
+        return self.__dbt.get_last_id()
+
     def test_exercise(self, test_id, exercise_id, point):
+
         """
         select exercise to test
 
@@ -108,6 +116,11 @@ class DatabaseOperate:
         conditions = ["TestCode = %d" % test_id]
         self.__dbt.delete(tables, conditions)
 
+    def delete_user(self, id):
+        tables = ["user"]
+        conditions = ["id = %d" % id]
+        self.__dbt.delete((tables, conditions))
+
     def update_exercise(self, exercise_id, columns, values):
         """
         update exercise by argus
@@ -135,8 +148,31 @@ class DatabaseOperate:
                     tables.append("exercise_extra_info")
                 conditions.append("ExerciseCode=%d" % exercise_id)
 
-        content = [','.join(update_base), ','.join(update_extra)]
-        self.__dbt.update(tables, content, conditions)
+        if not update_base:
+            contents = [''.join(update_extra)]
+        else:
+            contents = [','.join(update_base), ','.join(update_extra)]
+        self.__dbt.update(tables, contents, conditions)
+
+    def update_point(self, test_id, exercise_id, point):
+        """
+        update number by test_id,exercise_id
+
+        :param int test_id: the only representation of the paper
+        :param int exercise_id: the only representation of the exercise
+        :param float point: point
+        :return:
+        """
+        tables = ["paper_exercise"]
+        contents = ["point=%f" % point]
+        conditions = ["ExerciseCode=%d and TestCode=%d" % (test_id, exercise_id)]
+        self.__dbt.update(tables, contents, conditions)
+
+    def update_user(self, id, password):
+        tables = ["user"]
+        contents = ["password = %d" % password]
+        conditions = ["id = %d" % id]
+        self.__dbt.update(tables, contents, conditions)
 
     def query_exercise(self, condition) -> pd.DataFrame:
         """
@@ -199,7 +235,12 @@ class DatabaseOperate:
         tables = ["paper_exercise"]
         columns = ["*"]
         conditions = ["where TestCode=%d" % test_id]
-        return self.__dbt.query(tables,columns,conditions)
+        return self.__dbt.query(tables, columns, conditions)
+
+    def query_user(self):
+        tables = ["user"]
+        columns = ["id, name"]
+        return self.__dbt.query(tables, columns, [''])
 
     def statistic_exercise(self, column) -> pd.DataFrame:
         """
@@ -216,33 +257,18 @@ class DatabaseOperate:
         conditions = ["group by %s" % column]
         return self.__dbt.query(tables, columns, conditions)
 
-
 def main():
+    opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
     pd.set_option('display.max_columns', None,
                   'display.max_rows', None,
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
-    opr.test_exercise(1,170,2)
-    ques_data = opr.query_exercise_from_paper(1)
-    print(ques_data)
+    print(opr.query_exercise_from_paper(8))
+    opr.update_point(8,275,3)
+    print(opr.query_exercise_from_paper(8))
 
-    '''
-    add = opr.add_paper("'1,2,3'",0.1,0.8,0.1)
-    print(add)
-    paper = opr.query_paper("all")
-    print(paper)
-    '''
 
-    '''
-    for chap in [1,2,3,4,5,7]:
-        for category in ["'名词解释'","'问答'","'算法'","'计算'"]:
-            for diff in ["'低'","'高'","'中'"]:
-                for i in range(10):
-                    print(chap,category,diff,i)
-                    opr.add_exercise("'"+"测试用例|"+diff[1:-1]+"|CHAP"+str(chap)+"|"+category[1:-1]+"|ques"+str(i)+"'", "null", "'ans"+str(i)+"'", "null", category, chap, i, diff)
-    '''
 
 if __name__ == '__main__':
     main()
