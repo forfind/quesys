@@ -138,7 +138,7 @@ class DatabaseOperate:
         contents = [','.join(update_base), ','.join(update_extra)]
         self.__dbt.update(tables, contents, conditions)
 
-    def update_num(self, test_id, exercise_id, point):
+    def update_point(self, test_id, exercise_id, point):
         """
         update number by test_id,exercise_id
 
