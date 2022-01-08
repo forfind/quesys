@@ -265,7 +265,11 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
+
     print(bop.query_user())
+
+    #print(bop.update_exercise(275, ["chapter"], ["5"]))
+
 
 
 if __name__ == '__main__':
