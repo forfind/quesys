@@ -73,7 +73,8 @@ class DatabaseOperate:
         self.__dbt.add(tables, columns, values)
         return self.__dbt.get_last_id()
 
-    def test_exercise(self, test_id, exercise_id):
+    def test_exercise(self, test_id, exercise_id, point):
+
         """
         select exercise to test
 
@@ -89,8 +90,8 @@ class DatabaseOperate:
             num = 1
         else:
             num += 1
-        columns = ["TestCode, ExerciseCode, number"]
-        values = ["%d,%d,%d" % (test_id, exercise_id, num)]
+        columns = ["TestCode, ExerciseCode, number, point"]
+        values = ["%d,%d,%d,%s" % (test_id, exercise_id, num, str(point))]
         self.__dbt.add(tables, columns, values)
 
     def delete_exercise(self, exercise_id):
