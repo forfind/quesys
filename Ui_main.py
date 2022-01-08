@@ -63,6 +63,7 @@ class mainWindow(QMainWindow):
         self.schbtn.setObjectName("findbtn")
         self.chgbtn = QtWidgets.QPushButton(self.lwidget)
         self.chgbtn.setObjectName("editbtn")
+        self.chgbtn.hide()
         self.mngbtn = QtWidgets.QPushButton(self.lwidget)
         self.mngbtn.setObjectName("mngbtn")
         self.pdctbtn = QtWidgets.QPushButton(self.lwidget)

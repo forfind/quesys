@@ -83,6 +83,10 @@ def sreach(ui):
         cata = "'"+value+"'"
         d = opr.query_exercise("category="+cata)
         print(d)
+    if ui.diffbtn.isChecked():
+        diff = "'"+value+"'"
+        d = opr.query_exercise("difficulty="+diff)
+        print(d)
     #print(d[["ExerciseCode","topic","answer"]])
 
     for i in range(d.shape[0]):
@@ -364,8 +368,9 @@ def save_edit(ui):
     or_ans="'"+detail_data.at[0,"answer"]+"'"
     or_point = POINT
     point = float(ui.point.text())
+    print("test,ques,point",TEST_ID,code,POINT)
     if or_point != point:
-        opr.update_point(TEST_ID,code,POINT)
+        opr.update_point(TEST_ID,code,point)
     print("or_point",or_point)
 
     chap = int(ui.para1.text())

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-
     <list default="true" id="da4281bb-b3c7-405c-a79f-cc528ca7e4bd" name="Changes" comment="试题生成界面跟随数据库变化">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Ui_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Ui_main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_change.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_change.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui_sch.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_sch.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +47,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../img2b" />
     <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
   </component>
   <component name="RecentsManager">
@@ -55,7 +55,7 @@
       <recent name="F:\project\quesys" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.main">
     <configuration name="Ui_main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="quesys" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -163,12 +163,10 @@
     </configuration>
     <recent_temporary>
       <list>
-
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.Ui_main" />
         <item itemvalue="Python.database_operate" />
-
         <item itemvalue="Python.database_tool" />
       </list>
     </recent_temporary>
