@@ -135,7 +135,10 @@ class DatabaseOperate:
                     tables.append("exercise_extra_info")
                 conditions.append("ExerciseCode=%d" % exercise_id)
 
-        contents = [','.join(update_base), ','.join(update_extra)]
+        if not update_base:
+            contents = [''.join(update_extra)]
+        else:
+            contents = [','.join(update_base), ','.join(update_extra)]
         self.__dbt.update(tables, contents, conditions)
 
     def update_point(self, test_id, exercise_id, point):
@@ -238,7 +241,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.add_paper("'1,2,3'", 0.1, 0.8, 0.1))
+    print(bop.update_exercise(275, ["chapter"], ["5"]))
 
 
 if __name__ == '__main__':
