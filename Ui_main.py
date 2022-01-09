@@ -3,13 +3,15 @@ from functools import partial
 
 import PyQt5
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox, QGroupBox
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox, QGroupBox, \
+    QFileDialog, QLabel, QHBoxLayout
 from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
-from PyQt5.QtGui import QPainter, QPen
+from PyQt5.QtGui import QPainter, QPen, QPixmap
 from PyQt5.QtCore import Qt
 
 from database_operate import DatabaseOperate
-from ui_Qedit import *
+
+from ui_crt import *
 from ui_pdct import *
 from ui_sch import *
 from ui_change import *
@@ -96,6 +98,8 @@ class mainWindow(QMainWindow):
         self.addwidget.setObjectName('addwidget')
         self.addui = Ui_QeditForm()
         self.addui.setupUi(self.addwidget)
+        self.addui.picslc1.clicked.connect(self.openfile1)
+        self.addui.picslc2.clicked.connect(self.openfile2)
 
         self.schwidget = QWidget()
         self.schwidget.setObjectName('schwidget')
@@ -122,6 +126,39 @@ class mainWindow(QMainWindow):
         self.pdctui = Ui_pdctForm()
         self.pdctui.setupUi(self.pdctwidget)
         self.chaplist = []
+
+    def openfile1(self):
+
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+
+        if fname[0]:
+            print(fname[0])
+            self.pic1data = open(fname[0], 'rb').read()
+            self.addui.picpath1.setText(fname[0])
+
+            pixmap = QPixmap(fname[0])
+            self.lbl1 = QLabel(self)
+            self.lbl1.setPixmap(pixmap)
+            self.addui.grid1.addWidget(self.lbl1,0,2,1,1)
+            self.lbl1.setScaledContents(True)
+
+    def openfile2(self):
+
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+
+        if fname[0]:
+            print(fname[0])
+            self.pic2data = open(fname[0], 'rb').read()
+            self.addui.picpath2.setText(fname[0])
+
+            pixmap = QPixmap(fname[0])
+            self.lbl2 = QLabel(self)
+            self.lbl2.setPixmap(pixmap)
+            self.addui.grid2.addWidget(self.lbl2,0,2,1,1)
+            self.lbl2.setScaledContents(True)
+
+
+
 
     def create_piechart(self,ls):
         # 创建QPieSeries对象，它用来存放饼图的数据
@@ -276,7 +313,7 @@ class mainWindow(QMainWindow):
             chap = chapter_list[i][0]
             Chbox = QCheckBox("第"+chap+"章",parent=ui.range)
             ui.chaplayout.addWidget(Chbox)
-
+# TEST:
 def check_paper(ui):
     list = ui.paperlist
     print(list)
@@ -299,12 +336,36 @@ def check_paper(ui):
                     print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(ques_data.at[i,"point"]))
                     ui.paperlist.addItem("编号 "+str(ques_data.at[i,"ExerciseCode"])+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"]))
                 break
+class Example(QWidget):
 
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+
+    def initUI(self):
+
+        hbox = QHBoxLayout(self)
+        pixmap = QPixmap("3.png")
+
+        lbl = QLabel(self)
+        lbl.setPixmap(pixmap)
+        lbl.setScaledContents(True)
+
+        hbox.addWidget(lbl)
+        self.setLayout(hbox)
+
+        self.move(300, 200)
+        self.setWindowTitle('Red Rock')
+        self.show()
 def main():
     app = QApplication(sys.argv)
-    mainwin = mainWindow([['测试',1],['测试',2]])
-    mainwin.set_pdctview(["选择"],[["1",1],["2",5]])
+    mainwin = mainWindow([[['低', 402], ['高', 392], ['中', 396]], [['选择', 225], ['判断', 180], ['填空', 181], ['名词解释', 153], ['问答', 150], ['算法', 151], ['计算', 150]], [['1', 219], ['2', 217], ['3', 216], ['7', 96], ['4', 217], ['5', 216], ['6', 4], ['8', 3], ['9', 2]]])
 
+
+
+    ex = Example()
     mainwin.mngui.paperlist.addItem("1 8 3")
     mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
     mainwin.show()

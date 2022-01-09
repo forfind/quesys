@@ -26,24 +26,26 @@ def test(ui):
     print(cata)
 
 
-def add(ui):
+def add(win):
+    ui = win.addui
+    print(ui.picpath1.text())
     chap = int(ui.para1.text())
     sec = int(ui.para2.text())
     category = ''
     diff = ''
-    if ui.category_1.isChecked():
+    if ui.cata_1.isChecked():
         category = "'选择'"
-    if ui.category_2.isChecked():
+    if ui.cata_2.isChecked():
         category = "'判断'"
-    if ui.category_3.isChecked():
+    if ui.cata_3.isChecked():
         category = "'填空'"
-    if ui.category_4.isChecked():
+    if ui.cata_4.isChecked():
         category = "'名词解释'"
-    if ui.category_5.isChecked():
+    if ui.cata_5.isChecked():
         category = "'问答'"
-    if ui.category_6.isChecked():
+    if ui.cata_6.isChecked():
         category = "'算法'"
-    if ui.category_7.isChecked():
+    if ui.cata_7.isChecked():
         category = "'计算'"
     if ui.diff_1.isChecked():
         diff = "'低'"
@@ -56,9 +58,23 @@ def add(ui):
     ans = "'" + ui.ctt_2.toPlainText() + "'"
     print("章：", chap, "节:", sec, "类别:", category, "难度:", diff)
     print("题目", ques, "答案", ans)
+    print(ui.picpath1.text())
+    if ui.picpath1.text() != "":
+        pic1 = "'"+str(win.pic1data)+"'"
+        win.lbl1.hide()
+        ui.picpath1.setText("")
+    else:
+        pic1 = "null"
 
+    if ui.picpath2.text() != "":
+        pic2 = "'"+str(win.pic1data)+"'"
+        win.lbl2.hide()
+        ui.picpath2.setText("")
+    else:
+        pic2 = "null"
+    print(ques, pic1, ans, pic2)
     global opr
-    opr.add_exercise(ques, "null", ans, "null", category, chap, sec, diff)
+    opr.add_exercise(ques, pic1, ans, pic2, category, chap, sec, diff)
 
     ui.ctt_1.clear()
     ui.ctt_2.clear()
@@ -470,11 +486,11 @@ def save_edit(ui):
 def main():
     app = QApplication(sys.argv)
     datalist = statistic_info()
-    print(datalist)
+    print("datalist",datalist)
     mainwin = mainWindow(datalist)
     mainwin.show()
 
-    mainwin.addui.submit.clicked.connect(partial(add, mainwin.addui))
+    mainwin.addui.submit.clicked.connect(partial(add, mainwin))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
     mainwin.disbtn.clicked.connect(partial(updata_info,mainwin))
