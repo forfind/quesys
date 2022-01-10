@@ -29,6 +29,5 @@ def main():
     # 关闭连接
     conn.close()
 
-
 if __name__ == '__main__':
     main()
