@@ -1,5 +1,6 @@
 import pymysql
 from database_tool import DatabaseTool
+from database_tool import transform_image
 import pandas as pd
 
 
@@ -43,11 +44,16 @@ class DatabaseOperate:
         :param str difficulty: difficulty of with the exercise with '' include '高','中','低'
         :return: None
         """
-        tables = ["exercise_base_info", "exercise_extra_info"]
-        columns = ["topic,topic_picture,answer,answer_picture", "category,chapter,part,difficulty"]
-        values = [','.join([topic, topic_picture, answer, answer_picture]),
-                  ','.join([category, str(chapter), str(part), difficulty])]
-        self.__dbt.add(tables, columns, values)
+        if topic_picture != "null":
+            topic_picture = transform_image(topic_picture)
+        if answer_picture != "null":
+            answer_picture = transform_image(answer_picture)
+
+        base_sql = "INSERT INTO exercise_base_info (topic, topic_picture, answer, answer_picture) VALUES ({0}, %s, {1}, %s)".format(
+            topic, answer)
+        extra_sql = "INSERT INTO exercise_extra_info (category, chapter, part, difficulty) VALUES ({0}, {1}, {2}, {3})".format(
+            category, chapter, part, difficulty)
+        self.__dbt.image_execution(base_sql, extra_sql, [topic_picture, answer_picture])
         return self.__dbt.get_last_id()
 
     def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low):
@@ -265,7 +271,7 @@ def main():
                   'display.max_colwidth', None,
                   'display.width', 100,
                   'expand_frame_repr', False)
-    print(bop.update_exercise(275, ['difficulty', 'topic', 'answer'], ["'中'", "'aaaaa'", "'ans2'"]))
+    print(bop.query_exercise("exercise_base_info.ExerciseCode=1281"))
 
 
 if __name__ == '__main__':

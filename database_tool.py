@@ -14,6 +14,13 @@ def get_dataframe(value, description) -> pd.DataFrame:
     return result.groupby(level=0, axis=1).first()
 
 
+def transform_image(address):
+    fin = open(address, 'rb')
+    img = fin.read()
+    fin.close()
+    return img
+
+
 class DatabaseTool:
     __exercise_base = {"topic", "topic_picture", "answer", "answer_picture"}
     __exercise_extra = {"category", "chapter", "section", "difficulty"}
@@ -57,6 +64,16 @@ class DatabaseTool:
         result = self.__cursor.fetchall()
         return result, self.__cursor.description
 
+    def image_execution(self, base_sql, extra_sql, images):
+        try:
+            print(base_sql)
+            print(extra_sql)
+            self.__cursor.execute(base_sql, images)
+            self.__cursor.execute(extra_sql)
+        except pymysql.err.Error as e:
+            self.__conn.rollback()
+            print("Sql execution error")
+
     def add(self, tables, columns, values):
         """
         add to tables
@@ -68,7 +85,7 @@ class DatabaseTool:
         """
         sql = []
         for t, c, v in zip(tables, columns, values):
-            sql.append("insert into %s (%s) values (%s);" % (t, c, v))
+            sql.append("insert into {0} ({1}) values ({2});".format(t, c, v))
         self.__execution(sql)
 
     def delete(self, tables, conditions):
@@ -81,7 +98,7 @@ class DatabaseTool:
         """
         sql = []
         for t, c in zip(tables, conditions):
-            sql.append("delete from %s where %s;" % (t, c))
+            sql.append("delete from {0} where {1};".format(t, c))
         self.__execution(sql)
 
     def update(self, tables, contents, conditions):
@@ -95,7 +112,7 @@ class DatabaseTool:
         """
         sql = []
         for table, content, condition in zip(tables, contents, conditions):
-            sql.append("update %s set %s where %s;" % (table, content, condition))
+            sql.append("update {0} set {1} where {2};".format(table, content, condition))
         self.__execution(sql)
 
     def query(self, tables, columns, conditions) -> pd.DataFrame:
@@ -109,7 +126,7 @@ class DatabaseTool:
         """
         sql = []
         for t, col, con in zip(tables, columns, conditions):
-            sql.append("select %s from %s %s;" % (col, t, con))
+            sql.append("select {0} from {1} {2};".format(col, t, con))
 
         value, description = self.__execution(sql)
         return get_dataframe(value, description)
