@@ -105,6 +105,9 @@ class mainWindow(QMainWindow):
         self.schwidget.setObjectName('schwidget')
         self.schui = Ui_schForm()
         self.schui.setupUi(self.schwidget)
+        self.schui.difficulty.stateChanged.connect(self.change_state)
+        self.schui.category.stateChanged.connect(self.change_state)
+        self.schui.chapter.stateChanged.connect(self.change_state)
 
         self.chgwidget = QWidget()
         self.chgwidget.setObjectName('chgwidget')
@@ -149,16 +152,44 @@ class mainWindow(QMainWindow):
         if fname[0]:
             print(fname[0])
             self.pic2data = open(fname[0], 'rb').read()
+            print("picdata",self.pic2data)
             self.addui.picpath2.setText(fname[0])
-
             pixmap = QPixmap(fname[0])
             self.lbl2 = QLabel(self)
             self.lbl2.setPixmap(pixmap)
             self.addui.grid2.addWidget(self.lbl2,0,2,1,1)
             self.lbl2.setScaledContents(True)
 
-
-
+    def change_state(self):
+        ui = self.schui
+        if ui.difficulty == self.sender():
+            state = ui.difficulty.checkState()
+            ui.h.setChecked(state)
+            ui.l.setChecked(state)
+            ui.m.setChecked(state)
+        elif ui.category == self.sender():
+            state = ui.category.checkState()
+            ui.xz.setChecked(state)
+            ui.tk.setChecked(state)
+            ui.mc.setChecked(state)
+            ui.pd.setChecked(state)
+            ui.wd.setChecked(state)
+            ui.js.setChecked(state)
+            ui.sf.setChecked(state)
+        else:
+            state = ui.chapter.checkState()
+            ui.ch0.setChecked(state)
+            ui.ch1.setChecked(state)
+            ui.ch2.setChecked(state)
+            ui.ch3.setChecked(state)
+            ui.ch4.setChecked(state)
+            ui.ch5.setChecked(state)
+            ui.ch6.setChecked(state)
+            ui.ch7.setChecked(state)
+            ui.ch8.setChecked(state)
+            ui.ch9.setChecked(state)
+            ui.ch10.setChecked(state)
+            ui.ch11.setChecked(state)
 
     def create_piechart(self,ls):
         # 创建QPieSeries对象，它用来存放饼图的数据
