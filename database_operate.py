@@ -245,7 +245,7 @@ class DatabaseOperate:
 
     def query_user(self):
         tables = ["user"]
-        columns = ["id, name"]
+        columns = ["id, name, password"]
         return self.__dbt.query(tables, columns, [''])
 
     def statistic_exercise(self, column) -> pd.DataFrame:

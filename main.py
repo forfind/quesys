@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QPainter
 
 from Ui_main import *
+from ui_log import *
 from functools import partial
 from database_operate import *
 from PyQt5.QtWidgets import *
@@ -82,32 +83,76 @@ def add(win):
 
 def sreach(ui):
     global opr
-    value = ui.inputtxt.toPlainText()
-    numls = []
+    code = ui.quescode.text()
+    value = ui.keyword.text()
+    diff = []
+    chap = []
+    cate = []
+
+    if ui.h.isChecked():
+        diff.append("高")
+    if ui.m.isChecked():
+        diff.append("中")
+    if ui.l.isChecked():
+        diff.append("低")
+
+    if ui.xz.isChecked():
+        cate.append("选择")
+    if ui.tk.isChecked():
+        cate.append("填空")
+    if ui.pd.isChecked():
+        cate.append("判断")
+    if ui.wd.isChecked():
+        cate.append("问答")
+    if ui.sf.isChecked():
+        cate.append("算法")
+    if ui.js.isChecked():
+        cate.append("计算")
+    if ui.mc.isChecked():
+        cate.append("名词解释")
+
+    if ui.ch0.isChecked():
+        chap.append(0)
+    if ui.ch1.isChecked():
+        chap.append(1)
+    if ui.ch2.isChecked():
+        chap.append(2)
+    if ui.ch3.isChecked():
+        chap.append(3)
+    if ui.ch4.isChecked():
+        chap.append(4)
+    if ui.ch5.isChecked():
+        chap.append(5)
+    if ui.ch6.isChecked():
+        chap.append(6)
+    if ui.ch7.isChecked():
+        chap.append(7)
+    if ui.ch8.isChecked():
+        chap.append(8)
+    if ui.ch9.isChecked():
+        chap.append(9)
+    if ui.ch10.isChecked():
+        chap.append(10)
+    if ui.ch11.isChecked():
+        chap.append(11)
+
     ui.outputlist.clear()
-    if ui.keybtn.isChecked():
-        d = opr.query_exercise("all")
+    d = opr.query_exercise("all")
+    print(d)
+    print(cate,diff,chap)
+    if code != "":
+        intcode = int(code)
         for i in range(d.shape[0]):
-            if value  in d.at[i,"topic"]:
-                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+            if intcode == d.at[i,"ExerciseCode"]:
+                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+                return
+    else:
+        for i in range(d.shape[0]):
+            if value in d.at[i,"topic"] and d.at[i,"difficulty"] in diff and d.at[i,"chapter"] in chap and d.at[i,"category"] in cate:
+                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+'题目：'+'\n'+str(d.at[i,"topic"])+'\n'+'答案：'+'\n'+str(d.at[i,"answer"]))
         return
-    if ui.codebtn.isChecked():
-        d = opr.query_exercise("exercise_base_info.ExerciseCode="+value)
-        print(d)
 
-    if ui.catabtn.isChecked():
-        cata = "'"+value+"'"
-        d = opr.query_exercise("category="+cata)
-        print(d)
-    if ui.diffbtn.isChecked():
-        diff = "'"+value+"'"
-        d = opr.query_exercise("difficulty="+diff)
-        print(d)
-    #print(d[["ExerciseCode","topic","answer"]])
 
-    for i in range(d.shape[0]):
-        ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
-        #print(str(d.at[i,"ExerciseCode"])+' '+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
 
 def remove_item(list):
     global opr
@@ -483,8 +528,12 @@ def save_edit(ui):
     print(detail_data)
     '''
 
+ACCESS = 0
+
 def main():
     app = QApplication(sys.argv)
+
+
     datalist = statistic_info()
     print("datalist",datalist)
     mainwin = mainWindow(datalist)
@@ -505,6 +554,17 @@ def main():
 
     sys.exit(app.exec_())
 
+def login(logui):
+    global opr
+    name = logui.lineEdit.text()
+    pwd = logui.lineEdit_2.text()
+    logd = opr.query_user()
+    print(logd)
+    for i in range(logd.shape[0]):
+        if name == logd.at[i,"name"]:
+            if pwd == logd.at[i,"password"]:
+                logui.hide()
+                ACCESS=1
 
 if __name__ == '__main__':
     main()
