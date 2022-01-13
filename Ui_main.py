@@ -26,7 +26,7 @@ class mainWindow(QMainWindow):
 
     def init_ui(self,data):
 
-        self.resize(1000, 800)
+        self.resize(1200, 800)
 
         self.main_widget = QWidget()  # 创建窗口主部件
         self.main_widget.setObjectName('main_widget')  # 对象命名
@@ -53,6 +53,12 @@ class mainWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)  # 设置窗口主部件
 
     def init_left(self):
+        self.font = QtGui.QFont()
+        self.font.setFamily('微软雅黑')
+        self.font.setBold(True)
+        self.font.setPointSize(15)
+        self.font.setWeight(10)
+
         self.lwidget = QWidget()
         self.lwidget.setObjectName('lwidget')
 
@@ -61,17 +67,42 @@ class mainWindow(QMainWindow):
 
         self.addbtn = QtWidgets.QPushButton(self.lwidget)
         self.addbtn.setObjectName("addbtn")
+        self.addbtn.setFont(self.font)  #载入字体设置
+        self.addbtn.setFixedHeight(140)
+        self.addbtn.setCheckable(True)
+        self.addbtn.setFlat(True)  # 透明背景
+
         self.schbtn = QtWidgets.QPushButton(self.lwidget)
         self.schbtn.setObjectName("findbtn")
+        self.schbtn.setFont(self.font)  #载入字体设置
+        self.schbtn.setFixedHeight(140)
+        self.schbtn.setCheckable(True)
+        self.schbtn.setFlat(True)  # 透明背景
+
         self.chgbtn = QtWidgets.QPushButton(self.lwidget)
         self.chgbtn.setObjectName("editbtn")
         self.chgbtn.hide()
+
         self.mngbtn = QtWidgets.QPushButton(self.lwidget)
         self.mngbtn.setObjectName("mngbtn")
+        self.mngbtn.setFont(self.font)  #载入字体设置
+        self.mngbtn.setFixedHeight(140)
+        self.mngbtn.setCheckable(True)
+        self.mngbtn.setFlat(True)  # 透明背景
+
         self.pdctbtn = QtWidgets.QPushButton(self.lwidget)
         self.pdctbtn.setObjectName("probtn")
+        self.pdctbtn.setFont(self.font)  #载入字体设置
+        self.pdctbtn.setFixedHeight(140)
+        self.pdctbtn.setCheckable(True)
+        self.pdctbtn.setFlat(True)  # 透明背景
+
         self.disbtn = QtWidgets.QPushButton(self.lwidget)
         self.disbtn.setObjectName("disbtn")
+        self.disbtn.setFont(self.font)  #载入字体设置
+        self.disbtn.setFixedHeight(140)
+        self.disbtn.setCheckable(True)
+        self.disbtn.setFlat(True)  # 透明背景
 
         _translate = QtCore.QCoreApplication.translate
         self.addbtn.setText(_translate("MainWindow", "添加题目"))
@@ -113,7 +144,7 @@ class mainWindow(QMainWindow):
         self.chgwidget.setObjectName('chgwidget')
         self.chgui = Ui_chgForm()
         self.chgui.setupUi(self.chgwidget)
-        self.chgui.backbtn.clicked.connect(self.showmng)
+
 
         self.mngwidget = QWidget()
         self.mngwidget.setObjectName('mngwidget')
@@ -255,6 +286,11 @@ class mainWindow(QMainWindow):
         self.mngwidget.hide()
         self.allwidget.hide()
         self.pdctwidget.hide()
+        self.addbtn.setChecked(True)
+        self.schbtn.setChecked(False)
+        self.mngbtn.setChecked(False)
+        self.pdctbtn.setChecked(False)
+        self.disbtn.setChecked(False)
 
     def showsch(self):
         self.addwidget.hide()
@@ -263,6 +299,11 @@ class mainWindow(QMainWindow):
         self.mngwidget.hide()
         self.allwidget.hide()
         self.pdctwidget.hide()
+        self.addbtn.setChecked(False)
+        self.schbtn.setChecked(True)
+        self.mngbtn.setChecked(False)
+        self.pdctbtn.setChecked(False)
+        self.disbtn.setChecked(False)
 
     def showchg(self):
         self.addwidget.hide()
@@ -271,6 +312,11 @@ class mainWindow(QMainWindow):
         self.mngwidget.hide()
         self.allwidget.hide()
         self.pdctwidget.hide()
+        self.addbtn.setChecked(False)
+        self.schbtn.setChecked(False)
+        self.mngbtn.setChecked(False)
+        self.pdctbtn.setChecked(False)
+        self.disbtn.setChecked(False)
 
     def showmng(self):
         self.addwidget.hide()
@@ -279,6 +325,11 @@ class mainWindow(QMainWindow):
         self.mngwidget.show()
         self.allwidget.hide()
         self.pdctwidget.hide()
+        self.addbtn.setChecked(False)
+        self.schbtn.setChecked(False)
+        self.mngbtn.setChecked(True)
+        self.pdctbtn.setChecked(False)
+        self.disbtn.setChecked(False)
 
     def showpdct(self):
         self.addwidget.hide()
@@ -287,6 +338,11 @@ class mainWindow(QMainWindow):
         self.mngwidget.hide()
         self.allwidget.hide()
         self.pdctwidget.show()
+        self.addbtn.setChecked(False)
+        self.schbtn.setChecked(False)
+        self.mngbtn.setChecked(False)
+        self.pdctbtn.setChecked(True)
+        self.disbtn.setChecked(False)
 
     def showall(self,data):
 
@@ -301,6 +357,11 @@ class mainWindow(QMainWindow):
         self.allwidget = self.getview(data)
         self.main_layout.addWidget(self.allwidget, 0, 1, 1, 6)
         self.allwidget.show()
+        self.addbtn.setChecked(False)
+        self.schbtn.setChecked(False)
+        self.mngbtn.setChecked(False)
+        self.pdctbtn.setChecked(False)
+        self.disbtn.setChecked(True)
 
     def set_pdctview(self, category_list, chapter_list):
         ui = self.pdctui

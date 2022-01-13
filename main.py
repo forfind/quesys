@@ -1,14 +1,21 @@
+import os
 import random
 
-import PyQt5
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPen, QPainter
+import qdarkstyle
 
 from Ui_main import *
 from ui_log import *
 from functools import partial
 from database_operate import *
 from PyQt5.QtWidgets import *
+from qt_material import apply_stylesheet
+
+os.environ['QT_API'] = 'pyqt5'
+extra = {
+
+    # Density Scale
+    'density_scale': '0',
+}
 
 opr = DatabaseOperate("104.168.172.47", "forfind", "000000", "exercise")
 pd.set_option('display.max_columns', None,
@@ -18,6 +25,8 @@ pd.set_option('display.max_columns', None,
               'expand_frame_repr', False)
 POINT = 0
 TEST_ID = 0
+CHG_POINT = 0
+BACK_MNG = 0
 
 def test(ui):
     cata = ''
@@ -82,7 +91,8 @@ def add(win):
 
 
 def sreach(ui):
-    global opr
+    global opr,BACK_MNG
+    BACK_MNG = 0
     code = ui.quescode.text()
     value = ui.keyword.text()
     diff = []
@@ -144,12 +154,12 @@ def sreach(ui):
         intcode = int(code)
         for i in range(d.shape[0]):
             if intcode == d.at[i,"ExerciseCode"]:
-                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+str(d.at[i,"topic"])+' '+str(d.at[i,"answer"]))
+                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+str(d.at[i,"topic"])+'\n'+'答案：'+str(d.at[i,"answer"]))
                 return
     else:
         for i in range(d.shape[0]):
             if value in d.at[i,"topic"] and d.at[i,"difficulty"] in diff and d.at[i,"chapter"] in chap and d.at[i,"category"] in cate:
-                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+'题目：'+'\n'+str(d.at[i,"topic"])+'\n'+'答案：'+'\n'+str(d.at[i,"answer"]))
+                ui.outputlist.addItem(str(d.at[i,"ExerciseCode"])+'\n'+str(d.at[i,"topic"])+'\n'+'答案：'+str(d.at[i,"answer"]))
         return
 
 
@@ -301,19 +311,22 @@ def set_pdctview(win):
     win.set_pdctview(category_list,chapter_list)
 
 
-def manage_paper(ui):
-    global opr
+def back(win):
+    global opr,BACK_MNG
+    if BACK_MNG:
+        win.showmng()
+        ui = win.mngui
+        ui.mngwid.show()
+        ui.editwid.hide()
+        ui.paperlist.clear()
 
-    ui.mngwid.show()
-    ui.editwid.hide()
-    ui.paperlist.clear()
+        paper_data = opr.query_paper("all")
+        print(paper_data)
 
-    paper_data = opr.query_paper("all")
-    print(paper_data)
-
-    for i in range(paper_data.shape[0]):
-        ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
-
+        for i in range(paper_data.shape[0]):
+            ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
+    else:
+        win.showsch()
 
 def remove_paper(list):
     global opr
@@ -363,9 +376,10 @@ def check_paper(ui):
 
 
 def edit_ques(win):
+    global POINT,CHG_POINT
+    CHG_POINT = 1
     list = win.mngui.paperlist
     code = 0
-    global POINT
     if list.count() > 0:
         for i in range(list.count()):
             item = list.item(i)
@@ -378,6 +392,7 @@ def edit_ques(win):
     print(detail_data)
     win.showchg()
     ui = win.chgui
+    ui.pointBox.show()
     ui.codelabel.setText("试题详情-题号："+str(code))
     ui.point.setText(str(POINT))
 
@@ -415,7 +430,7 @@ def edit_ques(win):
 def save_edit(ui):
 
     global opr
-    global POINT,TEST_ID
+    global POINT,TEST_ID,CHG_POINT
 
     code = int(ui.codelabel.text()[8:])
     detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
@@ -427,12 +442,13 @@ def save_edit(ui):
     or_sec=detail_data.at[0,"part"]
     or_ques="'"+detail_data.at[0,"topic"]+"'"
     or_ans="'"+detail_data.at[0,"answer"]+"'"
-    or_point = POINT
-    point = float(ui.point.text())
-    print("test,ques,point",TEST_ID,code,POINT)
-    if or_point != point:
-        opr.update_point(TEST_ID,code,point)
-    print("or_point",or_point)
+    if CHG_POINT:
+        or_point = POINT
+        point = float(ui.point.text())
+        print("test,ques,point",TEST_ID,code,POINT)
+        if or_point != point:
+            opr.update_point(TEST_ID,code,point)
+        print("or_point",or_point)
 
     chap = int(ui.para1.text())
     sec = int(ui.para2.text())
@@ -530,10 +546,77 @@ def save_edit(ui):
 
 ACCESS = 0
 
+
+def edit_only_ques(win):
+    global CHG_POINT
+    CHG_POINT = 0
+    list = win.schui.outputlist
+    code = 0
+    if list.count() > 0:
+        for i in range(list.count()):
+            item = list.item(i)
+            if item.isSelected():
+                code = int(str(list.item(i).text()).split()[0])
+                break
+    print("code",code)
+    detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(code))
+    print(detail_data)
+    win.showchg()
+    ui = win.chgui
+    ui.codelabel.setText("试题详情-题号："+str(code))
+    ui.pointBox.hide()
+
+
+    cate = detail_data.at[0,"category"]
+    diff = detail_data.at[0,"difficulty"]
+
+    ui.para1.setValue(detail_data.at[0,"chapter"])
+    ui.para2.setValue(detail_data.at[0,"part"])
+    ui.ctt_1.setPlainText(detail_data.at[0,"topic"])
+    ui.ctt_2.setPlainText(detail_data.at[0,"answer"])
+    print(cate)
+    if cate == '选择':
+        ui.cata_1.setChecked(True)
+    elif cate == '判断':
+        ui.cata_2.setChecked(True)
+    elif cate == '填空':
+        ui.cata_3.setChecked(True)
+    elif cate == '名词解释':
+        ui.cata_4.setChecked(True)
+    elif cate == '问答':
+        ui.cata_5.setChecked(True)
+    elif cate == '算法':
+        ui.cata_6.setChecked(True)
+    elif cate == '计算':
+        ui.cata_7.setChecked(True)
+
+    if diff == "低":
+        ui.diff_1.setChecked(True)
+    elif diff == "高":
+        ui.diff_2.setChecked(True)
+    elif diff == "中":
+        ui.diff_3.setChecked(True)
+
+
+def manage_paper(ui):
+    global opr, BACK_MNG
+    BACK_MNG = 1
+    ui.mngwid.show()
+    ui.editwid.hide()
+    ui.paperlist.clear()
+
+    paper_data = opr.query_paper("all")
+    print(paper_data)
+
+    for i in range(paper_data.shape[0]):
+        ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
+
+
 def main():
     app = QApplication(sys.argv)
-
-
+    #apply_stylesheet(app, theme='dark_teal.xml')
+    #apply_stylesheet(app, 'default', invert_secondary=False, extra=extra)
+    #app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     datalist = statistic_info()
     print("datalist",datalist)
     mainwin = mainWindow(datalist)
@@ -542,15 +625,17 @@ def main():
     mainwin.addui.submit.clicked.connect(partial(add, mainwin))
     mainwin.schui.schbtn.clicked.connect(partial(sreach, mainwin.schui))
     mainwin.schui.delbtn.clicked.connect(partial(remove_item, mainwin.schui.outputlist))
+    mainwin.schui.chgbtn.clicked.connect(partial(edit_only_ques, mainwin))
     mainwin.disbtn.clicked.connect(partial(updata_info,mainwin))
     mainwin.pdctbtn.clicked.connect(partial(set_pdctview,mainwin))
     mainwin.pdctui.crtbtn.clicked.connect(partial(create_paper,mainwin.pdctui))
     mainwin.mngbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
     mainwin.mngui.delbtn.clicked.connect(partial(remove_paper,mainwin.mngui.paperlist))
     mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
-    mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
+    mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin))
     mainwin.mngui.chgbtn.clicked.connect(partial(edit_ques,mainwin))
     mainwin.chgui.submit.clicked.connect(partial(save_edit,mainwin.chgui))
+    mainwin.chgui.backbtn.clicked.connect(partial(back,mainwin))
 
     sys.exit(app.exec_())
 
