@@ -620,6 +620,7 @@ def main():
     datalist = statistic_info()
     print("datalist",datalist)
     mainwin = mainWindow(datalist)
+    #mainwin.showFullScreen()
     mainwin.show()
 
     mainwin.addui.submit.clicked.connect(partial(add, mainwin))

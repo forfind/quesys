@@ -6,8 +6,8 @@ import PyQt5
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QApplication, QVBoxLayout, QCheckBox, QGroupBox, \
     QFileDialog, QLabel, QHBoxLayout
 from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
-from PyQt5.QtGui import QPainter, QPen, QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPainter, QPen, QPixmap, QIcon
+from PyQt5.QtCore import Qt, QSize
 
 from database_operate import DatabaseOperate
 
@@ -25,8 +25,10 @@ class mainWindow(QMainWindow):
         self.init_ui(data)
 
     def init_ui(self,data):
-
-        self.resize(1200, 800)
+        desktop = QApplication.desktop()
+        wid = int(desktop.width()*0.9)
+        high = int(desktop.height()*0.9)
+        self.setFixedSize(wid, high)
 
         self.main_widget = QWidget()  # 创建窗口主部件
         self.main_widget.setObjectName('main_widget')  # 对象命名
@@ -65,14 +67,16 @@ class mainWindow(QMainWindow):
         self.llayout = QVBoxLayout()
         self.lwidget.setLayout(self.llayout)
 
-        self.addbtn = QtWidgets.QPushButton(self.lwidget)
+        self.addbtn = QtWidgets.QPushButton(QIcon("./src/img/add.png"),"",self.lwidget)
+        self.addbtn.setIconSize(QSize(100,100))
         self.addbtn.setObjectName("addbtn")
         self.addbtn.setFont(self.font)  #载入字体设置
         self.addbtn.setFixedHeight(140)
         self.addbtn.setCheckable(True)
         self.addbtn.setFlat(True)  # 透明背景
 
-        self.schbtn = QtWidgets.QPushButton(self.lwidget)
+        self.schbtn = QtWidgets.QPushButton(QIcon("./src/img/sch.png"),"",self.lwidget)
+        self.schbtn.setIconSize(QSize(100,100))
         self.schbtn.setObjectName("findbtn")
         self.schbtn.setFont(self.font)  #载入字体设置
         self.schbtn.setFixedHeight(140)
@@ -83,21 +87,24 @@ class mainWindow(QMainWindow):
         self.chgbtn.setObjectName("editbtn")
         self.chgbtn.hide()
 
-        self.mngbtn = QtWidgets.QPushButton(self.lwidget)
+        self.mngbtn = QtWidgets.QPushButton(QIcon("./src/img/mng.png"),"",self.lwidget)
+        self.mngbtn.setIconSize(QSize(100,100))
         self.mngbtn.setObjectName("mngbtn")
         self.mngbtn.setFont(self.font)  #载入字体设置
         self.mngbtn.setFixedHeight(140)
         self.mngbtn.setCheckable(True)
         self.mngbtn.setFlat(True)  # 透明背景
 
-        self.pdctbtn = QtWidgets.QPushButton(self.lwidget)
+        self.pdctbtn = QtWidgets.QPushButton(QIcon("./src/img/pdct.png"),"",self.lwidget)
+        self.pdctbtn.setIconSize(QSize(100,100))
         self.pdctbtn.setObjectName("probtn")
         self.pdctbtn.setFont(self.font)  #载入字体设置
         self.pdctbtn.setFixedHeight(140)
         self.pdctbtn.setCheckable(True)
         self.pdctbtn.setFlat(True)  # 透明背景
 
-        self.disbtn = QtWidgets.QPushButton(self.lwidget)
+        self.disbtn = QtWidgets.QPushButton(QIcon("./src/img/dis.png"),"",self.lwidget)
+        self.disbtn.setIconSize(QSize(100,100))
         self.disbtn.setObjectName("disbtn")
         self.disbtn.setFont(self.font)  #载入字体设置
         self.disbtn.setFixedHeight(140)
