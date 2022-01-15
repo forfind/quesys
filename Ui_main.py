@@ -22,6 +22,7 @@ class mainWindow(QMainWindow):
 
     def __init__(self,data):
         super().__init__()
+        self.setWindowTitle("QueSys操作系统试题自动生成系统")
         self.init_ui(data)
 
     def init_ui(self,data):
@@ -170,11 +171,11 @@ class mainWindow(QMainWindow):
 
     def openfile1(self):
 
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+        fname = QFileDialog.getOpenFileName(self, 'Open file', './src/img')
 
         if fname[0]:
             print(fname[0])
-            self.pic1data = open(fname[0], 'rb').read()
+            self.pic1data = fname[0]
             self.addui.picpath1.setText(fname[0])
 
             pixmap = QPixmap(fname[0])
@@ -185,11 +186,11 @@ class mainWindow(QMainWindow):
 
     def openfile2(self):
 
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+        fname = QFileDialog.getOpenFileName(self, 'Open file', './src/img')
 
         if fname[0]:
             print(fname[0])
-            self.pic2data = open(fname[0], 'rb').read()
+            self.pic2data = fname[0]
             print("picdata",self.pic2data)
             self.addui.picpath2.setText(fname[0])
             pixmap = QPixmap(fname[0])

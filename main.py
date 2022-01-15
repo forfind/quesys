@@ -9,6 +9,7 @@ from functools import partial
 from database_operate import *
 from PyQt5.QtWidgets import *
 from qt_material import apply_stylesheet
+from toWord import *
 
 os.environ['QT_API'] = 'pyqt5'
 extra = {
@@ -27,6 +28,7 @@ POINT = 0
 TEST_ID = 0
 CHG_POINT = 0
 BACK_MNG = 0
+TESTLIST = []
 
 def test(ui):
     cata = ''
@@ -70,14 +72,14 @@ def add(win):
     print("题目", ques, "答案", ans)
     print(ui.picpath1.text())
     if ui.picpath1.text() != "":
-        pic1 = "'"+str(win.pic1data)+"'"
+        pic1 = str(win.pic1data)
         win.lbl1.hide()
         ui.picpath1.setText("")
     else:
         pic1 = "null"
 
     if ui.picpath2.text() != "":
-        pic2 = "'"+str(win.pic1data)+"'"
+        pic2 = str(win.pic1data)
         win.lbl2.hide()
         ui.picpath2.setText("")
     else:
@@ -296,7 +298,9 @@ def create_paper_with(cate,chap,diff):
     #def add_paper(self, chapter, difficulty_high, difficulty_middle, difficulty_low)
     #def test_exercise(self, test_id, exercise_id)
     print(chstr,float(diff[0]),float(1-diff[0]-diff[1]),float(diff[1]))
-    NewPaperId = opr.add_paper("'"+chstr+"'",float(diff[0]),float(1-diff[0]-diff[1]),float(diff[1]))
+    h,m,l = float(diff[0]),float(1-diff[0]-diff[1]),float(diff[1])
+
+    NewPaperId = opr.add_paper("'"+chstr+"'",round(h,2),round(m,2),round(l,2))
     print(NewPaperId)
     for i in range(len(final)):
         for ExcerciseCode in final[i]:
@@ -345,7 +349,8 @@ def remove_paper(list):
                 break
 
 def check_paper(ui):
-    global opr,TEST_ID
+    global opr,TEST_ID,TESTLIST
+    TESTLIST = []
     list = ui.paperlist
     if list.count() > 0:
         for i in range(list.count()):
@@ -369,8 +374,10 @@ def check_paper(ui):
                     excercisecode = ques_data.at[i,"ExerciseCode"]
                     detail_data = opr.query_exercise("exercise_base_info.ExerciseCode="+str(excercisecode))
                     print(detail_data)
+                    queslist = [str(detail_data.at[0,"category"]),str(ques_data.at[i,"point"]),str(ques_data.at[i,"number"]),str(detail_data.at[0,"topic"]),detail_data.at[0,"topic_picture"],str(detail_data.at[0,"answer"]),detail_data.at[0,"answer_picture"]]
+                    TESTLIST.append(queslist)
                     print(str(ques_data.at[i,"ExerciseCode"])+' '+str(ques_data.at[i,"number"])+' '+str(point))
-                    ui.paperlist.addItem("编号 "+str(excercisecode)+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"])+'\t'+str(detail_data.at[0,"topic"])+"\t"+str(detail_data.at[0,"answer"]))
+                    ui.paperlist.addItem("编号 "+str(excercisecode)+'\t'+"试卷中序号 "+str(ques_data.at[i,"number"])+'\t'+"分值 "+str(ques_data.at[i,"point"])+'\n'+str(detail_data.at[0,"topic"])+"\n"+"答案："+str(detail_data.at[0,"answer"]))
 
                 break
 
@@ -544,8 +551,6 @@ def save_edit(ui):
     print(detail_data)
     '''
 
-ACCESS = 0
-
 
 def edit_only_ques(win):
     global CHG_POINT
@@ -597,7 +602,6 @@ def edit_only_ques(win):
     elif diff == "中":
         ui.diff_3.setChecked(True)
 
-
 def manage_paper(ui):
     global opr, BACK_MNG
     BACK_MNG = 1
@@ -609,8 +613,15 @@ def manage_paper(ui):
     print(paper_data)
 
     for i in range(paper_data.shape[0]):
-        ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\t\t范围:%s"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
+        ui.paperlist.addItem("试卷编号 %s \t高难度题占比:%s\t低难度题占比:%s\n\t\t范围:%s\n"%(str(paper_data.at[i,"TestCode"]),str(paper_data.at[i,"difficulty_high"]),str(paper_data.at[i,"difficulty_low"]),str(paper_data.at[i,"chapter"])))
 
+def output_test():
+    global TEST_ID,TESTLIST
+    write_Test(TEST_ID,TESTLIST)
+
+def output_ans():
+    global TEST_ID,TESTLIST
+    write_TestandAns(TEST_ID,TESTLIST)
 
 def main():
     app = QApplication(sys.argv)
@@ -633,24 +644,15 @@ def main():
     mainwin.mngbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
     mainwin.mngui.delbtn.clicked.connect(partial(remove_paper,mainwin.mngui.paperlist))
     mainwin.mngui.chkbtn.clicked.connect(partial(check_paper,mainwin.mngui))
-    mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin))
+    mainwin.mngui.backbtn.clicked.connect(partial(manage_paper,mainwin.mngui))
     mainwin.mngui.chgbtn.clicked.connect(partial(edit_ques,mainwin))
     mainwin.chgui.submit.clicked.connect(partial(save_edit,mainwin.chgui))
     mainwin.chgui.backbtn.clicked.connect(partial(back,mainwin))
+    mainwin.mngui.outans.clicked.connect(output_ans)
+    mainwin.mngui.outtest.clicked.connect(output_test)
 
     sys.exit(app.exec_())
 
-def login(logui):
-    global opr
-    name = logui.lineEdit.text()
-    pwd = logui.lineEdit_2.text()
-    logd = opr.query_user()
-    print(logd)
-    for i in range(logd.shape[0]):
-        if name == logd.at[i,"name"]:
-            if pwd == logd.at[i,"password"]:
-                logui.hide()
-                ACCESS=1
 
 if __name__ == '__main__':
     main()
